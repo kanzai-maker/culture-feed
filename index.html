@@ -18,14 +18,12 @@
       overflow-x: hidden; min-height: 100vh;
     }
 
-    /* --- 維持：銀河・星雲背景 --- */
+    /* 背景演出：維持 */
     .galaxy-container {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background: 
-        radial-gradient(circle at 15% 20%, rgba(120, 40, 200, 0.4), transparent 60%),
-        radial-gradient(circle at 85% 80%, rgba(20, 80, 180, 0.3), transparent 60%),
-        radial-gradient(ellipse at 50% 40%, rgba(180, 60, 40, 0.2), transparent 70%),
-        url('https://www.transparenttextures.com/patterns/stardust.png');
+      background: radial-gradient(circle at 15% 20%, rgba(120, 40, 200, 0.4), transparent 60%),
+                  radial-gradient(circle at 85% 80%, rgba(20, 80, 180, 0.3), transparent 60%),
+                  url('https://www.transparenttextures.com/patterns/stardust.png');
     }
     .twinkle-star { position: absolute; border-radius: 50%; opacity: 0; animation: twinkle var(--d) ease-in-out infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
@@ -41,7 +39,6 @@
     header { text-align: center; padding: 30px 0 20px; }
     .main-title { font-size: clamp(2.8rem, 9vw, 5rem); font-weight: 900; letter-spacing: 8px; text-shadow: 0 0 40px var(--orange); margin: 0; }
     .sub-title { opacity: 0.9; font-size: 22px; letter-spacing: 5px; margin-top: 15px; font-weight: bold; color: #fffde7; }
-    .emoji-growth { font-size: 2rem; margin-top: 10px; letter-spacing: 15px; }
 
     .grid { display: grid; grid-template-columns: 1fr 420px; gap: 30px; }
     @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
@@ -52,27 +49,19 @@
     #feedList { max-height: 800px; overflow-y: auto; padding-right: 15px; scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
     .post-card { background: rgba(255,255,255,0.08); border-radius: 25px; padding: 25px; margin-bottom: 25px; border-left: 8px solid var(--orange); }
     .post-header-info { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
-    .post-category-label { color: var(--orange); font-size: 22px; font-weight: 900; margin-bottom: 12px; display: block; }
+    .post-category-label { color: var(--orange); font-size: 18px; font-weight: bold; margin-bottom: 10px; display: block; }
 
-    /* --- 修正：ランキングセレクトボックス --- */
-    .rank-select { width: 100%; height: 50px; border-radius: 12px; margin-bottom: 20px; background: #111; color: var(--orange); border: 1px solid var(--orange); padding: 0 15px; font-size: 16px; font-weight: bold; }
+    /* --- 修正：10 Core Values 整列 --- */
+    .values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 15px; margin: 10px 0; }
+    .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
+    .value-item input { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--orange); }
 
-    /* --- 修正：投稿時の演出 --- */
-    .thanks-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 6rem; font-weight: 900; color: #fffde7; text-shadow: 0 0 50px #ffd700; z-index: 10000; pointer-events: none; animation: thanksFade 2.5s forwards; }
-    @keyframes thanksFade { 0% { opacity: 0; scale: 0.5; } 20% { opacity: 1; scale: 1.2; } 100% { opacity: 0; transform: translate(-50%, -70%); scale: 1; } }
-    .particle { position: fixed; pointer-events: none; z-index: 9999; animation: particle-move 2s ease-out forwards; }
-    @keyframes particle-move { 0% { opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)); opacity: 0; } }
-
-    /* --- 修正：リアクションボタン --- */
-    .reaction-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 14px; border-radius: 99px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 5px; }
-    .reaction-btn:hover { background: rgba(255,255,255,0.2); }
-
-    /* --- 修正：コメント/返信エリア --- */
-    .reply-section { margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
-    .reply-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; margin-bottom: 10px; }
+    /* トレンド（修正） */
+    .trend-clickable { cursor: pointer; padding: 5px; border-radius: 8px; transition: 0.2s; }
+    .trend-clickable:hover { background: rgba(255,255,255,0.1); }
 
     textarea, select, input[type="text"] { width: 100%; background: var(--input-bg); border: 1px solid #555; color: white; padding: 15px; border-radius: 12px; margin-top: 8px; font-size: 16px; outline: none; }
-    .btn-post { width: 100%; padding: 22px; background: linear-gradient(135deg, var(--orange), #ffcc80); color: #000; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; margin-top: 30px; font-size: 22px; }
+    .btn-post { width: 100%; padding: 22px; background: linear-gradient(135deg, var(--orange), #ffcc80); color: #000; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; margin-top: 20px; font-size: 22px; }
   </style>
 </head>
 <body>
@@ -84,7 +73,6 @@
   <header>
     <h1 class="main-title">CULTURE SEED</h1>
     <div class="sub-title">第二東京コンタクトセンター</div>
-    <div class="emoji-growth">🫘 🌱 🌼</div>
   </header>
 
   <div class="grid">
@@ -92,7 +80,7 @@
       <section class="panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
           <h2 style="margin:0;">Seed Box</h2>
-          <select id="archiveSelect" style="width:auto; height:40px; border-radius:20px; border:1px solid var(--orange); background:#000; color:var(--orange); padding:0 10px;">
+          <select id="archiveSelect" style="width:auto; border:1px solid var(--orange); background:#000; color:var(--orange); border-radius:20px; padding:0 10px;">
             <option value="2026-03">2026年3月</option>
             <option value="2026-02">2026年2月</option>
           </select>
@@ -103,18 +91,23 @@
       <section class="panel">
         <h2 style="margin-top:0;">Sow Seeds</h2>
         <form id="cultureForm">
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-            <select id="fromName" required></select>
-            <select id="toName"></select>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+            <div><label>From</label><select id="fromName" required></select></div>
+            <div><label>To</label><select id="toName"></select></div>
           </div>
-          <select id="category" style="margin-top:15px;">
-            <option value="Thanks">🤝 Thanks</option>
-            <option value="Business">💰 商売を展開、商売を心から楽しむ</option>
-            <option value="MVV">🔥 MVVを体現</option>
-            <option value="Owner">💎 主体性の発揮</option>
-            <option value="Bonji">✨ 凡事徹底</option>
+          <label>項目選択</label>
+          <select id="category">
+            <option value="🤝 Thanks">🤝 Thanks</option>
+            <option value="💰 商売を展開、商売を心から楽しむ">💰 商売を展開、商売を心から楽しむ</option>
+            <option value="🔥 MVVを体現">🔥 MVVを体現</option>
+            <option value="💎 主体性の発揮">💎 主体性の発揮</option>
+            <option value="✨ 凡事徹底">✨ 凡事徹底</option>
           </select>
-          <textarea id="message" rows="5" required style="margin-top:20px;" placeholder="エピソードを入力してください..."></textarea>
+          <div style="margin-top:20px;">
+            <label>10 Core Values (複数選択可)</label>
+            <div class="values-grid" id="valuesCheckboxes"></div>
+          </div>
+          <textarea id="message" rows="5" required placeholder="エピソードを入力してください..." style="margin-top:10px;"></textarea>
           <button type="submit" class="btn-post">投稿を送信</button>
         </form>
       </section>
@@ -123,14 +116,10 @@
     <aside>
       <section class="panel">
         <h3 style="margin-top:0; color:var(--orange);">トレンド</h3>
-        <div id="trendStats" style="font-size:18px; line-height:2.2;"></div>
+        <div id="trendStats" style="font-size:16px; line-height:2.2;"></div>
       </section>
       <section class="panel">
         <h3 style="margin-top:0; color:var(--orange);">今月のランキング</h3>
-        <select id="rankArchiveSelect" class="rank-select">
-          <option value="2026-03">2026年3月のランキング</option>
-          <option value="2026-02">2026年2月のランキング</option>
-        </select>
         <div id="rankingList"></div>
       </section>
     </aside>
@@ -156,111 +145,82 @@
   const postsRef = ref(db, 'posts');
 
   const members = ["第二全体", "未選択", "安齋 慶人", "金井 裕之介", "中村 景一郎", "前田 拓真", "庄司 祐亮", "太田 魁晟", "高本 優", "白鳥 拓人", "柳沢 緋里", "和田 翔太郎", "斉藤 直文", "中川 春花", "三登 有夏", "金兒 胤栄", "山﨑 紀史", "茨 陸翔", "古田 大貴", "吉増 海斗"];
-  const fixedReactions = [
-    {emoji: "🤝", label: "Thanks"},
-    {emoji: "💰", label: "商売"},
-    {emoji: "🔥", label: "MVV"},
-    {emoji: "💎", label: "主体性"},
-    {emoji: "✨", label: "凡事徹底"}
-  ];
+  const coreValues = ["Speed 速度", "Change & Challenge 変化と挑戦", "Input & Output 学びと行動", "Priority 優先順位", "Continuous Outcome 継続的成果", "Responsibility 責任感", "Key Communication 本質的議論", "Team Work 共創", "Creativity 発想", "Long-term thinking 長期思考"];
+  const categories = ["🤝 Thanks", "💰 商売を展開、商売を心から楽しむ", "🔥 MVVを体現", "💎 主体性の発揮", "✨ 凡事徹底"];
   let rawData = {};
 
-  const f = document.getElementById('fromName'), t = document.getElementById('toName');
+  const f = document.getElementById('fromName'), t = document.getElementById('toName'), vGrid = document.getElementById('valuesCheckboxes');
   members.forEach(m => { f.add(new Option(m, m)); t.add(new Option(m, m)); });
+  coreValues.forEach(v => { vGrid.innerHTML += `<label class="value-item"><input type="checkbox" name="cv" value="${v}">${v}</label>`; });
 
   onValue(postsRef, (s) => { rawData = s.val() || {}; refreshUI(); });
 
   function refreshUI() {
     const boxMonth = document.getElementById('archiveSelect').value;
-    const rankMonth = document.getElementById('rankArchiveSelect').value;
     const posts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === boxMonth).reverse();
     
+    // Seed Box 修正箇所
     document.getElementById('feedList').innerHTML = posts.map(p => `
       <div class="post-card">
         <div class="post-header-info">${p.from} ➔ ${p.to}</div>
         <span class="post-category-label">${p.category}</span>
-        <div style="margin:20px 0; font-size:18px; line-height:1.7; white-space:pre-wrap;">${p.message}</div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          ${fixedReactions.map(r => `
-            <button class="reaction-btn" onclick="window.react('${p.id}','${r.emoji}',${(p.reactions||{})[r.emoji]||0})">
-              ${r.emoji} ${r.label} <span>${(p.reactions||{})[r.emoji]||0}</span>
-            </button>
+        <div style="margin:15px 0; font-size:16px; line-height:1.7; white-space:pre-wrap;">${p.message}</div>
+        <div style="display:flex; gap:10px;">
+          ${Object.entries(p.reactions || {"👏":0, "🔥":0, "💰":0}).map(([emoji, count]) => `
+            <button style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer;" onclick="window.react('${p.id}','${emoji}',${count})">${emoji} ${count}</button>
           `).join('')}
-          <button class="reaction-btn" style="background:rgba(255,255,255,0.05)" onclick="window.promptEmoji('${p.id}')">＋</button>
-        </div>
-        <div class="reply-section">
-          ${p.replies ? Object.entries(p.replies).map(([rid, r]) => `
-            <div class="reply-item">
-              <div>${r.text}</div>
-              <div style="margin-top:8px; display:flex; gap:8px;">
-                ${fixedReactions.map(fr => `<button style="background:none; border:none; color:#aaa; cursor:pointer; font-size:12px;" onclick="window.reactReply('${p.id}','${rid}','${fr.emoji}',${(r.reactions||{})[fr.emoji]||0})">${fr.emoji} ${(r.reactions||{})[fr.emoji]||0}</button>`).join('')}
-              </div>
-            </div>
-          `).join('') : ''}
-          <div style="display:flex; gap:10px; margin-top:10px;">
-            <input type="text" id="re-${p.id}" placeholder="返信..." style="height:45px; margin:0; font-size:14px;">
-            <button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:10px; padding:0 20px; cursor:pointer; font-weight:bold; color:black;">送信</button>
-          </div>
         </div>
       </div>
     `).join('') || "種がありません";
 
-    // トレンド・ランキング（維持）
-    const rPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === rankMonth);
-    const cats = { Thanks:0, Business:0, MVV:0, Owner:0, Bonji:0 };
+    // トレンド 修正箇所
+    const catsCount = {}; categories.forEach(c => catsCount[c] = 0);
     const scores = {};
-    rPosts.forEach(p => {
-      if(p.category.includes('Thanks')) cats.Thanks++;
-      else if(p.category.includes('Business')) cats.Business++;
-      else if(p.category.includes('MVV')) cats.MVV++;
-      else if(p.category.includes('Owner')) cats.Owner++;
-      else if(p.category.includes('Bonji')) cats.Bonji++;
+    posts.forEach(p => {
+      if(catsCount[p.category] !== undefined) catsCount[p.category]++;
       const target = p.to !== "未選択" ? p.to : p.from;
       scores[target] = (scores[target] || 0) + 1;
     });
-    document.getElementById('trendStats').innerHTML = `Total: ${rPosts.length}<br>🤝 Thanks: ${cats.Thanks}<br>💰 商売: ${cats.Business}<br>🔥 MVV: ${cats.MVV}<br>💎 主体性: ${cats.Owner}<br>✨ 凡事: ${cats.Bonji}`;
+    
+    document.getElementById('trendStats').innerHTML = `<div style="font-size:22px; color:var(--orange); font-weight:bold; margin-bottom:10px;">Total: ${posts.length}</div>` + 
+      categories.map(c => `<div class="trend-clickable" onclick="alert('${c}の投稿数: ${catsCount[c]}')">${c}: ${catsCount[c]}</div>`).join('');
+
     const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0, 8);
-    document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`<div style="font-size:20px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${i+1}. ${n}</span><strong>${c} pt</strong></div>`).join('') || "No Data";
+    document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`<div style="font-size:18px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${i+1}. ${n}</span><strong>${c} pt</strong></div>`).join('') || "No Data";
   }
 
-  // --- 修正：アクション系関数 ---
-  window.react = (id, emoji, c) => update(ref(db, `posts/${id}/reactions`), { [emoji]: c + 1 });
-  window.reactReply = (pid, rid, emoji, c) => update(ref(db, `posts/${pid}/replies/${rid}/reactions`), { [emoji]: c + 1 });
-  window.promptEmoji = (id) => { const e = prompt("好きな絵文字を入力:"); if(e) window.react(id, e, 0); };
-  window.addReply = (id) => { const t = document.getElementById(`re-${id}`).value; if(t) { push(ref(db, `posts/${id}/replies`), { text: t, timestamp: serverTimestamp() }); document.getElementById(`re-${id}`).value = ""; } };
+  window.react = (id, e, c) => update(ref(db, `posts/${id}/reactions`), { [e]: c + 1 });
 
   document.getElementById('cultureForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const now = new Date();
     const autoDateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    push(postsRef, { from: f.value, to: t.value, category: document.getElementById('category').value, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: autoDateKey })
-    .then(() => { e.target.reset(); showThanksEffect(); });
+    const checks = Array.from(document.querySelectorAll('input[name="cv"]:checked')).map(c => c.value);
+    
+    // Core Values をハッシュタグとしてメッセージの末尾に追加
+    let finalMessage = document.getElementById('message').value;
+    if(checks.length > 0) {
+      finalMessage += "\n\n" + checks.map(v => "#" + v.split(' ')[0]).join(' ');
+    }
+
+    push(postsRef, { 
+      from: f.value, 
+      to: t.value, 
+      category: document.getElementById('category').value, 
+      message: finalMessage, 
+      timestamp: serverTimestamp(), 
+      dateKey: autoDateKey 
+    }).then(() => { e.target.reset(); });
   });
 
-  function showThanksEffect() {
-    const t = document.createElement('div'); t.className = 'thanks-popup'; t.innerText = 'Thanks! ✨';
-    document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
-    const items = ["🌸", "🌼", "✨", "⭐", "☆"];
-    for(let i=0; i<40; i++) {
-      const p = document.createElement('div'); p.className = 'particle'; p.innerText = items[Math.floor(Math.random()*items.length)];
-      p.style.left = '50%'; p.style.top = '50%';
-      p.style.setProperty('--tx', (Math.random()-0.5)*1000+'px'); p.style.setProperty('--ty', (Math.random()-0.5)*1000+'px');
-      p.style.setProperty('--tr', Math.random()*720+'deg');
-      document.body.appendChild(p); setTimeout(() => p.remove(), 2000);
-    }
-  }
-
   document.getElementById('archiveSelect').addEventListener('change', refreshUI);
-  document.getElementById('rankArchiveSelect').addEventListener('change', refreshUI);
 
-  // --- 維持：星空演出 ---
+  // 背景：維持
   const sf = document.getElementById('starField');
-  const colors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff"];
-  for(let i=0; i<250; i++) {
+  for(let i=0; i<200; i++) {
     const s = document.createElement('div'); s.className = 'twinkle-star';
-    s.style.width = s.style.height = (Math.random()*3+1)+'px';
-    s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*150+'vh';
-    s.style.background = colors[Math.floor(Math.random()*colors.length)];
+    s.style.width = s.style.height = (Math.random()*2.5+0.5)+'px';
+    s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*120+'vh';
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
   setInterval(() => {
@@ -268,7 +228,7 @@
     s.style.left = Math.random()*110+'vw'; s.style.animationDuration = (Math.random()*1.2+0.8)+'s';
     s.style.background = 'linear-gradient(to bottom, transparent, #fff)'; sf.appendChild(s);
     setTimeout(() => s.remove(), 2500);
-  }, 300);
+  }, 400);
 </script>
 </body>
 </html>
