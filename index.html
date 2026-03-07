@@ -18,24 +18,18 @@
       overflow-x: hidden; min-height: 100vh;
     }
 
-    /* --- 修正点：豪華な星雲・星間雲・多色銀河背景（下部まで継続） --- */
+    /* --- 維持：銀河・星雲背景 --- */
     .galaxy-container {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: 
-        radial-gradient(circle at 15% 20%, rgba(120, 40, 200, 0.4), transparent 60%), /* 星雲 紫 */
-        radial-gradient(circle at 85% 80%, rgba(20, 80, 180, 0.3), transparent 60%), /* 星雲 青 */
-        radial-gradient(ellipse at 50% 40%, rgba(180, 60, 40, 0.2), transparent 70%), /* 星間雲 赤 */
+        radial-gradient(circle at 15% 20%, rgba(120, 40, 200, 0.4), transparent 60%),
+        radial-gradient(circle at 85% 80%, rgba(20, 80, 180, 0.3), transparent 60%),
+        radial-gradient(ellipse at 50% 40%, rgba(180, 60, 40, 0.2), transparent 70%),
         url('https://www.transparenttextures.com/patterns/stardust.png');
     }
-    .twinkle-star {
-      position: absolute; border-radius: 50%; opacity: 0; 
-      animation: twinkle var(--d) ease-in-out infinite;
-    }
+    .twinkle-star { position: absolute; border-radius: 50%; opacity: 0; animation: twinkle var(--d) ease-in-out infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
-    .shooting-star {
-      position: absolute; top: -150px; width: 2px;
-      opacity: 0; animation: shoot linear infinite;
-    }
+    .shooting-star { position: absolute; top: -150px; width: 2px; opacity: 0; animation: shoot linear infinite; }
     @keyframes shoot {
       0% { transform: translate(100vw, 0) rotate(35deg); opacity: 0; }
       15% { opacity: 1; }
@@ -52,40 +46,33 @@
     .grid { display: grid; grid-template-columns: 1fr 420px; gap: 30px; }
     @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
 
-    .panel {
-      background: var(--glass); border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 32px; padding: 30px; margin-bottom: 30px; backdrop-filter: blur(25px);
-    }
+    .panel { background: var(--glass); border: 1px solid rgba(255,255,255,0.15); border-radius: 32px; padding: 30px; margin-bottom: 30px; backdrop-filter: blur(25px); }
 
-    /* Seed Box エリア（維持） */
-    #feedList {
-      max-height: 800px; overflow-y: auto; padding-right: 15px;
-      scrollbar-width: thin; scrollbar-color: var(--orange) transparent;
-    }
-    #feedList::-webkit-scrollbar { width: 6px; }
-    #feedList::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 10px; }
-
-    .sort-area { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .sort-btn {
-      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);
-      color: white; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px;
-    }
-    .sort-btn.active { background: var(--orange); color: #000; font-weight: bold; }
-
+    /* Seed Box（維持） */
+    #feedList { max-height: 800px; overflow-y: auto; padding-right: 15px; scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
     .post-card { background: rgba(255,255,255,0.08); border-radius: 25px; padding: 25px; margin-bottom: 25px; border-left: 8px solid var(--orange); }
-    .post-header-info { font-size: 22px; font-weight: bold; margin-bottom: 10px; color: #fff; }
+    .post-header-info { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
     .post-category-label { color: var(--orange); font-size: 22px; font-weight: 900; margin-bottom: 12px; display: block; }
-    
-    .btn-post {
-      width: 100%; padding: 22px; background: linear-gradient(135deg, var(--orange), #ffcc80);
-      color: #000; font-weight: 900; border: none; border-radius: 18px; cursor: pointer;
-      margin-top: 30px; font-size: 22px;
-    }
 
-    textarea, select, input[type="text"] {
-      width: 100%; background: var(--input-bg); border: 1px solid #555; color: white;
-      padding: 15px; border-radius: 12px; margin-top: 8px; font-size: 16px; outline: none;
-    }
+    /* --- 修正：ランキングセレクトボックス --- */
+    .rank-select { width: 100%; height: 50px; border-radius: 12px; margin-bottom: 20px; background: #111; color: var(--orange); border: 1px solid var(--orange); padding: 0 15px; font-size: 16px; font-weight: bold; }
+
+    /* --- 修正：投稿時の演出 --- */
+    .thanks-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 6rem; font-weight: 900; color: #fffde7; text-shadow: 0 0 50px #ffd700; z-index: 10000; pointer-events: none; animation: thanksFade 2.5s forwards; }
+    @keyframes thanksFade { 0% { opacity: 0; scale: 0.5; } 20% { opacity: 1; scale: 1.2; } 100% { opacity: 0; transform: translate(-50%, -70%); scale: 1; } }
+    .particle { position: fixed; pointer-events: none; z-index: 9999; animation: particle-move 2s ease-out forwards; }
+    @keyframes particle-move { 0% { opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)); opacity: 0; } }
+
+    /* --- 修正：リアクションボタン --- */
+    .reaction-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 14px; border-radius: 99px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 5px; }
+    .reaction-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* --- 修正：コメント/返信エリア --- */
+    .reply-section { margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
+    .reply-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; margin-bottom: 10px; }
+
+    textarea, select, input[type="text"] { width: 100%; background: var(--input-bg); border: 1px solid #555; color: white; padding: 15px; border-radius: 12px; margin-top: 8px; font-size: 16px; outline: none; }
+    .btn-post { width: 100%; padding: 22px; background: linear-gradient(135deg, var(--orange), #ffcc80); color: #000; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; margin-top: 30px; font-size: 22px; }
   </style>
 </head>
 <body>
@@ -105,28 +92,22 @@
       <section class="panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
           <h2 style="margin:0;">Seed Box</h2>
-          <select id="archiveSelect" style="width:auto; height:40px; border-radius:20px; font-size:14px; padding:0 10px; border:1px solid var(--orange); background:#000; color:var(--orange);">
+          <select id="archiveSelect" style="width:auto; height:40px; border-radius:20px; border:1px solid var(--orange); background:#000; color:var(--orange); padding:0 10px;">
             <option value="2026-03">2026年3月</option>
             <option value="2026-02">2026年2月</option>
           </select>
         </div>
-        <div class="sort-area">
-          <button class="sort-btn active" onclick="changeSort('new', this)">✨ 新着順</button>
-          <button class="sort-btn" onclick="changeSort('stamps', this)">🔥 スタンプ順</button>
-          <button class="sort-btn" onclick="changeSort('comments', this)">💬 コメント順</button>
-        </div>
-        <div id="feedList">銀河を同期中...</div>
+        <div id="feedList">同期中...</div>
       </section>
 
       <section class="panel">
         <h2 style="margin-top:0;">Sow Seeds</h2>
         <form id="cultureForm">
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:15px;">
-            <div><label>From</label><select id="fromName" required></select></div>
-            <div><label>To</label><select id="toName"></select></div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+            <select id="fromName" required></select>
+            <select id="toName"></select>
           </div>
-          <label>Category</label>
-          <select id="category">
+          <select id="category" style="margin-top:15px;">
             <option value="Thanks">🤝 Thanks</option>
             <option value="Business">💰 商売を展開、商売を心から楽しむ</option>
             <option value="MVV">🔥 MVVを体現</option>
@@ -146,7 +127,7 @@
       </section>
       <section class="panel">
         <h3 style="margin-top:0; color:var(--orange);">今月のランキング</h3>
-        <select id="rankArchiveSelect" style="width:100%; height:40px; border-radius:10px; margin-bottom:20px; background:#000; color:var(--orange); border:1px solid var(--orange);">
+        <select id="rankArchiveSelect" class="rank-select">
           <option value="2026-03">2026年3月のランキング</option>
           <option value="2026-02">2026年2月のランキング</option>
         </select>
@@ -160,7 +141,6 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, push, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // --- Firebase Config (差し替えてください) ---
   const firebaseConfig = {
     apiKey: "AIzaSyC_2bIvYpfgKrgyfQ9YKE1CykpnxLfQi0k",
     authDomain: "second-cc-culture-feed.firebaseapp.com",
@@ -175,10 +155,15 @@
   const db = getDatabase(app);
   const postsRef = ref(db, 'posts');
 
-  // リストの先頭に「第二全体」を追加
   const members = ["第二全体", "未選択", "安齋 慶人", "金井 裕之介", "中村 景一郎", "前田 拓真", "庄司 祐亮", "太田 魁晟", "高本 優", "白鳥 拓人", "柳沢 緋里", "和田 翔太郎", "斉藤 直文", "中川 春花", "三登 有夏", "金兒 胤栄", "山﨑 紀史", "茨 陸翔", "古田 大貴", "吉増 海斗"];
+  const fixedReactions = [
+    {emoji: "🤝", label: "Thanks"},
+    {emoji: "💰", label: "商売"},
+    {emoji: "🔥", label: "MVV"},
+    {emoji: "💎", label: "主体性"},
+    {emoji: "✨", label: "凡事徹底"}
+  ];
   let rawData = {};
-  let currentSort = 'new';
 
   const f = document.getElementById('fromName'), t = document.getElementById('toName');
   members.forEach(m => { f.add(new Option(m, m)); t.add(new Option(m, m)); });
@@ -188,91 +173,93 @@
   function refreshUI() {
     const boxMonth = document.getElementById('archiveSelect').value;
     const rankMonth = document.getElementById('rankArchiveSelect').value;
+    const posts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === boxMonth).reverse();
     
-    let feedPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === boxMonth);
-    if(currentSort === 'stamps') {
-      feedPosts.sort((a,b) => (Object.values(b.reactions||{}).reduce((s,v)=>s+v,0)) - (Object.values(a.reactions||{}).reduce((s,v)=>s+v,0)));
-    } else if(currentSort === 'comments') {
-      feedPosts.sort((a,b) => Object.keys(b.replies||{}).length - Object.keys(a.replies||{}).length);
-    } else { feedPosts.reverse(); }
-    
-    renderFeed(feedPosts, boxMonth);
-    const rankPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === rankMonth);
-    renderStats(rankPosts);
-    renderRanking(rankPosts);
-  }
-
-  function renderFeed(posts, month) {
-    const list = document.getElementById('feedList');
-    list.innerHTML = posts.map(p => `
+    document.getElementById('feedList').innerHTML = posts.map(p => `
       <div class="post-card">
         <div class="post-header-info">${p.from} ➔ ${p.to}</div>
         <span class="post-category-label">${p.category}</span>
         <div style="margin:20px 0; font-size:18px; line-height:1.7; white-space:pre-wrap;">${p.message}</div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          ${Object.entries(p.reactions || {"👏":0, "🔥":0, "💰":0}).map(([emoji, count]) => `
-            <button style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer;" onclick="window.addReaction('${p.id}', '${emoji}', ${count})">${emoji} ${count}</button>
+          ${fixedReactions.map(r => `
+            <button class="reaction-btn" onclick="window.react('${p.id}','${r.emoji}',${(p.reactions||{})[r.emoji]||0})">
+              ${r.emoji} ${r.label} <span>${(p.reactions||{})[r.emoji]||0}</span>
+            </button>
           `).join('')}
-          <button style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:36px; height:36px; color:white; cursor:pointer;" onclick="window.promptEmoji('${p.id}')">+</button>
+          <button class="reaction-btn" style="background:rgba(255,255,255,0.05)" onclick="window.promptEmoji('${p.id}')">＋</button>
+        </div>
+        <div class="reply-section">
+          ${p.replies ? Object.entries(p.replies).map(([rid, r]) => `
+            <div class="reply-item">
+              <div>${r.text}</div>
+              <div style="margin-top:8px; display:flex; gap:8px;">
+                ${fixedReactions.map(fr => `<button style="background:none; border:none; color:#aaa; cursor:pointer; font-size:12px;" onclick="window.reactReply('${p.id}','${rid}','${fr.emoji}',${(r.reactions||{})[fr.emoji]||0})">${fr.emoji} ${(r.reactions||{})[fr.emoji]||0}</button>`).join('')}
+              </div>
+            </div>
+          `).join('') : ''}
+          <div style="display:flex; gap:10px; margin-top:10px;">
+            <input type="text" id="re-${p.id}" placeholder="返信..." style="height:45px; margin:0; font-size:14px;">
+            <button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:10px; padding:0 20px; cursor:pointer; font-weight:bold; color:black;">送信</button>
+          </div>
         </div>
       </div>
-    `).join('') || `<div style="text-align:center; padding:20px; opacity:0.5;">${month} の種はまだありません。</div>`;
-  }
+    `).join('') || "種がありません";
 
-  function renderStats(posts) {
+    // トレンド・ランキング（維持）
+    const rPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === rankMonth);
     const cats = { Thanks:0, Business:0, MVV:0, Owner:0, Bonji:0 };
-    posts.forEach(p => { 
-      // 内部データが古い文言でも集計できるよう調整
-      if(p.category.includes('Thanks')) cats.Thanks++;
-      else if(p.category.includes('Business') || p.category.includes('商売')) cats.Business++;
-      else if(p.category.includes('MVV')) cats.MVV++;
-      else if(p.category.includes('Owner') || p.category.includes('主体性')) cats.Owner++;
-      else if(p.category.includes('Bonji') || p.category.includes('凡事')) cats.Bonji++;
-    });
-    // 文言修正を反映
-    document.getElementById('trendStats').innerHTML = `
-      <div style="font-size:24px; color:var(--orange); font-weight:bold;">Total: ${posts.length}</div>
-      🤝 Thanks: ${cats.Thanks}<br>
-      💰 商売を展開、商売を心から楽しむ: ${cats.Business}<br>
-      🔥 MVVを体現: ${cats.MVV}<br>
-      💎 主体性の発揮: ${cats.Owner}<br>
-      ✨ 凡事徹底: ${cats.Bonji}
-    `;
-  }
-
-  function renderRanking(posts) {
     const scores = {};
-    posts.forEach(p => { const target = p.to !== "未選択" ? p.to : p.from; scores[target] = (scores[target] || 0) + 1; });
+    rPosts.forEach(p => {
+      if(p.category.includes('Thanks')) cats.Thanks++;
+      else if(p.category.includes('Business')) cats.Business++;
+      else if(p.category.includes('MVV')) cats.MVV++;
+      else if(p.category.includes('Owner')) cats.Owner++;
+      else if(p.category.includes('Bonji')) cats.Bonji++;
+      const target = p.to !== "未選択" ? p.to : p.from;
+      scores[target] = (scores[target] || 0) + 1;
+    });
+    document.getElementById('trendStats').innerHTML = `Total: ${rPosts.length}<br>🤝 Thanks: ${cats.Thanks}<br>💰 商売: ${cats.Business}<br>🔥 MVV: ${cats.MVV}<br>💎 主体性: ${cats.Owner}<br>✨ 凡事: ${cats.Bonji}`;
     const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0, 8);
-    document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`
-      <div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;">
-        <span>${i+1}. ${n}</span><strong>${c} pt</strong>
-      </div>
-    `).join('') || "No data";
+    document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`<div style="font-size:20px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${i+1}. ${n}</span><strong>${c} pt</strong></div>`).join('') || "No Data";
   }
 
-  window.changeSort = (type, btn) => { currentSort = type; document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); refreshUI(); };
-  window.addReaction = (id, emoji, count) => update(ref(db, `posts/${id}/reactions`), { [emoji]: count + 1 });
-  window.promptEmoji = (id) => { const e = prompt("好きな絵文字を入力してください:"); if(e) window.addReaction(id, e, 0); };
+  // --- 修正：アクション系関数 ---
+  window.react = (id, emoji, c) => update(ref(db, `posts/${id}/reactions`), { [emoji]: c + 1 });
+  window.reactReply = (pid, rid, emoji, c) => update(ref(db, `posts/${pid}/replies/${rid}/reactions`), { [emoji]: c + 1 });
+  window.promptEmoji = (id) => { const e = prompt("好きな絵文字を入力:"); if(e) window.react(id, e, 0); };
+  window.addReply = (id) => { const t = document.getElementById(`re-${id}`).value; if(t) { push(ref(db, `posts/${id}/replies`), { text: t, timestamp: serverTimestamp() }); document.getElementById(`re-${id}`).value = ""; } };
 
   document.getElementById('cultureForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const now = new Date();
     const autoDateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    push(postsRef, { from: f.value, to: t.value, category: document.getElementById('category').value, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: autoDateKey });
-    e.target.reset();
+    push(postsRef, { from: f.value, to: t.value, category: document.getElementById('category').value, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: autoDateKey })
+    .then(() => { e.target.reset(); showThanksEffect(); });
   });
+
+  function showThanksEffect() {
+    const t = document.createElement('div'); t.className = 'thanks-popup'; t.innerText = 'Thanks! ✨';
+    document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
+    const items = ["🌸", "🌼", "✨", "⭐", "☆"];
+    for(let i=0; i<40; i++) {
+      const p = document.createElement('div'); p.className = 'particle'; p.innerText = items[Math.floor(Math.random()*items.length)];
+      p.style.left = '50%'; p.style.top = '50%';
+      p.style.setProperty('--tx', (Math.random()-0.5)*1000+'px'); p.style.setProperty('--ty', (Math.random()-0.5)*1000+'px');
+      p.style.setProperty('--tr', Math.random()*720+'deg');
+      document.body.appendChild(p); setTimeout(() => p.remove(), 2000);
+    }
+  }
 
   document.getElementById('archiveSelect').addEventListener('change', refreshUI);
   document.getElementById('rankArchiveSelect').addEventListener('change', refreshUI);
 
-  // --- 修正点：豪華な多色の星と流れ星の生成 ---
+  // --- 維持：星空演出 ---
   const sf = document.getElementById('starField');
-  const colors = ["#ffffff", "#fffde7", "#e1bee7", "#ffcc80", "#c8e6c9", "#bbdefb", "#ff5252"];
-  for(let i=0; i<300; i++) {
+  const colors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff"];
+  for(let i=0; i<250; i++) {
     const s = document.createElement('div'); s.className = 'twinkle-star';
     s.style.width = s.style.height = (Math.random()*3+1)+'px';
-    s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*150+'vh'; // 下部まで
+    s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*150+'vh';
     s.style.background = colors[Math.floor(Math.random()*colors.length)];
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
