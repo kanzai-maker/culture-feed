@@ -191,21 +191,33 @@
   }
 
   function renderFeed(posts) {
+    /* 修正：リアクションボタンを固定の5項目（絵文字＋テキスト）に変更 */
+    const fixedReactions = [
+      {emoji: "🤝", label: "Thanks"},
+      {emoji: "💰", label: "商売"},
+      {emoji: "🔥", label: "MVV"},
+      {emoji: "💎", label: "主体者"},
+      {emoji: "✨", label: "凡事徹底"}
+    ];
+
     document.getElementById('feedList').innerHTML = posts.map(p => `
       <div class="post-card">
         <div class="post-header-info">${p.from} ➔ ${p.to}</div>
         <span class="post-category-label">${p.category}</span>
         <div style="margin:10px 0; color:var(--orange); font-size:12px;">${p.values ? p.values.map(v=>'#'+v.split(' ')[0]).join(' ') : ''}</div>
         <div style="margin:15px 0; font-size:18px; line-height:1.7; white-space:pre-wrap;">${p.message}</div>
-        <div style="display:flex; gap:10px;">
-          ${Object.entries(p.reactions || {"👏":0, "🔥":0, "💰":0}).map(([emoji, count]) => `<button onclick="window.addReaction('${p.id}','${emoji}',${count})" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer;">${emoji} ${count}</button>`).join('')}
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          ${fixedReactions.map(fr => {
+            const count = (p.reactions && p.reactions[fr.emoji]) ? p.reactions[fr.emoji] : 0;
+            return `<button onclick="window.addReaction('${p.id}','${fr.emoji}',${count})" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer; font-size:14px;">${fr.emoji}${fr.label} ${count}</button>`;
+          }).join('')}
           <button onclick="window.promptEmoji('${p.id}')" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer;">＋</button>
         </div>
         <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
           ${p.replies ? Object.values(p.replies).map(r => `<div style="background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; margin-bottom:5px; font-size:14px;">${r.text}</div>`).join('') : ''}
-          <div style="display:flex; gap:5px; margin-top:10px;">
-            <input type="text" id="re-${p.id}" placeholder="返信..." style="height:35px; font-size:13px; margin:0;">
-            <button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:8px; padding:0 15px; color:black; font-weight:bold; cursor:pointer;">送信</button>
+          <div style="display:flex; gap:10px; margin-top:10px; align-items: center;">
+            <input type="text" id="re-${p.id}" placeholder="返信..." style="flex:1; height:45px; font-size:14px; margin:0;">
+            <button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:12px; height:45px; padding:0 25px; color:black; font-weight:bold; cursor:pointer; white-space:nowrap; min-width:80px;">送信</button>
           </div>
         </div>
       </div>
