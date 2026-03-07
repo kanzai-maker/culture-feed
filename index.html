@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>CULTURE SEED - 第二東京CC</title>
+  <title>🚀CULTURE SEED✨ - 第二東京CC</title>
   <style>
     :root {
       --orange: #ff8c1a;
@@ -18,7 +18,7 @@
       overflow-x: hidden; min-height: 100vh;
     }
 
-    /* --- 背景：多色銀河・星雲・星間雲 --- */
+    /*背景：多色銀河・星雲・星間雲（維持）*/
     .galaxy-container {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: 
@@ -37,33 +37,35 @@
       100% { opacity: 0; }
     }
 
-    /* --- 投稿演出：Thanksポップアップ --- */
+    /*投稿演出：Thanksポップアップ（維持）*/
     .thanks-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 6rem; font-weight: 900; color: #fffde7; text-shadow: 0 0 50px #ffd700; z-index: 10000; pointer-events: none; animation: thanksFade 2.5s forwards; }
     @keyframes thanksFade { 0% { opacity: 0; scale: 0.5; } 20% { opacity: 1; scale: 1.2; } 100% { opacity: 0; transform: translate(-50%, -70%); scale: 1; } }
     .particle { position: fixed; pointer-events: none; z-index: 9999; animation: particle-move 2s ease-out forwards; }
     @keyframes particle-move { 0% { opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)); opacity: 0; } }
 
     .container { width: 94%; max-width: 1250px; margin: 0 auto; position: relative; z-index: 10; padding-bottom: 80px; }
+    
+    /* ヘッダー位置の最適化（維持） */
     header { text-align: center; padding: 30px 0 20px; }
     .main-title { font-size: clamp(2.8rem, 9vw, 5rem); font-weight: 900; letter-spacing: 8px; text-shadow: 0 0 40px var(--orange); margin: 0; }
-    .sub-title { opacity: 0.9; font-size: 22px; letter-spacing: 5px; margin-top: 15px; font-weight: bold; color: #fffde7; }
+    .emoji-growth { font-size: 2rem; margin-top: 10px; letter-spacing: 15px; }
 
     .grid { display: grid; grid-template-columns: 1fr 420px; gap: 30px; }
     @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
 
     .panel { background: var(--glass); border: 1px solid rgba(255,255,255,0.15); border-radius: 32px; padding: 30px; margin-bottom: 30px; backdrop-filter: blur(25px); }
 
-    /* ソートボタン */
+    /* ソートボタン（維持） */
     .sort-area { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
     .sort-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-size: 13px; }
     .sort-btn.active { background: var(--orange); color: #000; font-weight: bold; }
 
-    /* 10 Core Values */
+    /* 10 Core Values（維持） */
     .values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 15px; margin: 10px 0; }
     .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
     .value-item input { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--orange); }
 
-    /* Seed Box（維持） */
+    /* Seed Box エリア（維持） */
     #feedList { max-height: 800px; overflow-y: auto; padding-right: 15px; scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
     .post-card { background: rgba(255,255,255,0.08); border-radius: 25px; padding: 25px; margin-bottom: 25px; border-left: 8px solid var(--orange); }
     .post-header-info { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
@@ -85,8 +87,9 @@
 
 <div class="container">
   <header>
-    <h1 class="main-title">CULTURE SEED</h1>
+    <h1 class="main-title">🚀CULTURE SEED✨</h1>
     <div class="sub-title">第二東京コンタクトセンター</div>
+    <div class="emoji-growth">🫘 → 🌱 → 🌼</div>
   </header>
 
   <div class="grid">
@@ -155,6 +158,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, push, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+  // --- Firebase Config (差し替えてください) ---
   const firebaseConfig = {
     apiKey: "AIzaSyC_2bIvYpfgKrgyfQ9YKE1CykpnxLfQi0k",
     authDomain: "second-cc-culture-feed.firebaseapp.com",
@@ -184,18 +188,18 @@
     const boxMonth = document.getElementById('archiveSelect').value;
     const rankMonth = document.getElementById('rankArchiveSelect').value;
     
-    let posts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === boxMonth);
-    if (sortMode === 'stamp') posts.sort((a, b) => (Object.values(b.reactions||{}).reduce((s,c)=>s+c,0)) - (Object.values(a.reactions||{}).reduce((s,c)=>s+c,0)));
-    else if (sortMode === 'comment') posts.sort((a, b) => Object.keys(b.replies||{}).length - Object.keys(a.replies||{}).length);
+    let feedPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === boxMonth);
+    if (sortMode === 'stamp') feedPosts.sort((a, b) => (Object.values(b.reactions||{}).reduce((s,c)=>s+c,0)) - (Object.values(a.reactions||{}).reduce((s,c)=>s+c,0)));
+    else if (sortMode === 'comment') feedPosts.sort((a, b) => Object.keys(b.replies||{}).length - Object.keys(a.replies||{}).length);
     else posts.reverse();
 
-    renderFeed(posts);
+    renderFeed(feedPosts, boxMonth);
     const rPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === rankMonth);
     renderStats(rPosts);
     renderRanking(rPosts);
   }
 
-  function renderFeed(posts) {
+  function renderFeed(posts, month) {
     document.getElementById('feedList').innerHTML = posts.map(p => `
       <div class="post-card">
         <div class="post-header-info">${p.from} ➔ ${p.to}</div>
@@ -228,12 +232,16 @@
     const scores = {};
     posts.forEach(p => { const target = p.to !== "未選択" ? p.to : p.from; scores[target] = (scores[target] || 0) + 1; });
     const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0, 8);
-    document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${i+1}. ${n}</span><strong>${c} pt</strong></div>`).join('');
+    document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`
+      <div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;">
+        <span>${i+1}. ${n}</span><strong>${c} pt</strong>
+      </div>
+    `).join('') || "No data";
   }
 
   window.setSort = (m) => { sortMode = m; document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active')); document.getElementById(`sort-${m}`).classList.add('active'); refreshUI(); };
   window.addReaction = (id, emoji, count) => update(ref(db, `posts/${id}/reactions`), { [emoji]: count + 1 });
-  window.promptEmoji = (id) => { const e = prompt("絵文字を入力:"); if(e) window.addReaction(id, e, 0); };
+  window.promptEmoji = (id) => { const e = prompt("好きな絵文字を入力:"); if(e) window.addReaction(id, e, 0); };
   window.addReply = (id) => { const t = document.getElementById(`re-${id}`).value; if(t) { push(ref(db, `posts/${id}/replies`), { text: t, timestamp: serverTimestamp() }); document.getElementById(`re-${id}`).value = ""; } };
 
   document.getElementById('cultureForm').addEventListener('submit', (e) => {
@@ -261,12 +269,13 @@
   document.getElementById('archiveSelect').addEventListener('change', refreshUI);
   document.getElementById('rankArchiveSelect').addEventListener('change', refreshUI);
 
+  // --- 維持：多色星空・流れ星 ---
   const sf = document.getElementById('starField');
   const starColors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0"];
   for(let i=0; i<250; i++) {
     const s = document.createElement('div'); s.className = 'twinkle-star';
     s.style.width = s.style.height = (Math.random()*3+1)+'px';
-    s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*150+'vh';
+    s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*150+'vh'; // 下部まで
     s.style.background = starColors[Math.floor(Math.random()*starColors.length)];
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
