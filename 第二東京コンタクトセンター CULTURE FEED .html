@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第二東京コンタクトセンター CULTURE FEED</title>
+  <style>
+    :root {
+      --orange: #ff8c1a;
+      --star-white: #ffffff;
+      --star-yellow: #fffde7;
+      --star-purple: #e1bee7;
+      --glass: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(0, 0, 0, 0.7);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: #010208; color: #fff;
+      font-family: "Inter", "Noto Sans JP", sans-serif;
+      overflow-x: hidden; min-height: 100vh;
+    }
+
+    /* 濃密な銀河背景 */
+    .galaxy-container {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: 
+        radial-gradient(circle at 50% 50%, rgba(40, 30, 100, 0.6), transparent),
+        radial-gradient(circle at 80% 20%, rgba(80, 40, 120, 0.4), transparent),
+        url('https://www.transparenttextures.com/patterns/stardust.png');
+      background-size: cover;
+    }
+
+    /* またたく星（大小さまざま） */
+    .twinkle-star {
+      position: absolute; border-radius: 50%; background: white;
+      opacity: 0; animation: twinkle var(--d) ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* 大量・多色の流れ星 */
+    .shooting-star {
+      position: absolute; top: -120px; width: 2px;
+      opacity: 0; animation: shoot linear infinite;
+    }
+    @keyframes shoot {
+      0% { transform: translate(100vw, 0) rotate(40deg); opacity: 0; }
+      15% { opacity: 1; }
+      35% { transform: translate(-20vw, 100vh) rotate(40deg); opacity: 0; }
+      100% { opacity: 0; }
+    }
+
+    /* 巨大DNAバックグラウンド */
+    .dna-bg {
+      position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+      font-size: 650px; opacity: 0.15; z-index: -1;
+      filter: blur(2px) drop-shadow(0 0 80px rgba(255,140,26,0.4));
+      animation: dnaRotate 20s linear infinite;
+    }
+    @keyframes dnaRotate {
+      from { transform: translateX(-50%) rotateY(0deg); }
+      to { transform: translateX(-50%) rotateY(360deg); }
+    }
+
+    .container { width: min(1200px, 95vw); margin: 0 auto; position: relative; z-index: 10; padding-bottom: 100px; }
+    header { text-align: center; padding: 120px 0; }
+    .main-title { font-size: 5.5rem; font-weight: 900; margin: 0; letter-spacing: 10px; text-shadow: 0 0 50px rgba(255,140,26,0.7); }
+    .emoji-growth { font-size: 2.2rem; margin-top: 25px; letter-spacing: 25px; }
+
+    .grid { display: grid; grid-template-columns: 1fr 380px; gap: 35px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: var(--glass); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 32px; padding: 35px; margin-bottom: 35px; backdrop-filter: blur(25px);
+    }
+
+    .values-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 15px 25px;
+      background: rgba(0,0,0,0.5); padding: 25px; border-radius: 15px;
+    }
+    .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
+    .value-item input { width: 18px; height: 18px; margin-right: 12px; accent-color: var(--orange); }
+
+    textarea, select, input {
+      width: 100%; background: var(--input-bg); border: 1px solid #444; color: white;
+      padding: 15px; border-radius: 12px; margin-top: 10px; outline: none;
+    }
+
+    .btn-post {
+      width: 100%; padding: 22px; background: linear-gradient(135deg, var(--orange), #ffcc80);
+      color: #000; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; margin-top: 25px; font-size: 18px;
+    }
+
+    .post-card { background: rgba(255,255,255,0.07); border-radius: 25px; padding: 30px; margin-bottom: 25px; border-left: 8px solid var(--orange); }
+
+    /* ランキングタブ */
+    .rank-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+    .tab-btn {
+      flex: 1; padding: 8px 4px; font-size: 10px; background: rgba(255,255,255,0.1); border: none;
+      color: white; border-radius: 8px; cursor: pointer; white-space: nowrap;
+    }
+    .tab-btn.active { background: var(--orange); color: #000; font-weight: bold; }
+
+    .thanks-pop {
+      position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 100px; font-weight: 900; color: #fffde7; text-shadow: 0 0 60px var(--orange);
+      pointer-events: none; z-index: 1000; animation: popOut 2s forwards;
+    }
+    @keyframes popOut { 0% { opacity:0; scale:0.5; } 20% { opacity:1; scale:1.4; } 100% { opacity:0; transform: translate(-50%, -250%); } }
+  </style>
+</head>
+<body>
+
+<div class="galaxy-container"></div>
+<div id="starField"></div>
+
+<div class="container">
+  <header>
+    <div class="dna-bg">🧬</div>
+    <h1 class="main-title">CULTURE FEED</h1>
+    <div class="emoji-growth">🫘 🌱 🌼</div>
+    <div style="margin-top:20px; opacity:0.7; letter-spacing: 4px; font-weight: 300;">第二東京コンタクトセンター</div>
+  </header>
+
+  <div class="grid">
+    <main>
+      <div style="margin-bottom: 35px; display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.07); padding: 12px 30px; border-radius: 60px; width: fit-content; border: 1px solid rgba(255,255,255,0.1);">
+        <label style="font-size: 14px; font-weight: bold;">表示期間:</label>
+        <select id="archiveSelect" style="width: 200px; margin:0; background:transparent; border:none; color:var(--orange); font-weight:bold; cursor:pointer;">
+          <option value="2026-03">2026年3月 (今月)</option>
+          <option value="2026-02">2026年2月</option>
+          <option value="2026-01">2026年1月</option>
+        </select>
+      </div>
+
+      <section class="panel">
+        <h2 style="margin-top:0;">Culture Feed</h2>
+        <div id="feedList">銀河のデータを同期中...</div>
+      </section>
+
+      <section class="panel" id="postPanel">
+        <h2 style="margin-top:0;">投稿する</h2>
+        <form id="cultureForm">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px; margin-bottom:25px;">
+            <div><label>投稿者</label><select id="fromName" required></select></div>
+            <div><label>対象者（任意）</label><select id="toName"></select></div>
+          </div>
+          <div class="field" style="margin-bottom:25px;">
+            <label>カテゴリ</label>
+            <select id="category">
+              <option value="THANKS">🤝 THANKS</option>
+              <option value="BUSINESS">💰 商売を楽しむ</option>
+              <option value="MVV">🔥 MVV体現</option>
+              <option value="OWNER">💎 主体性</option>
+              <option value="BONJI">✨ 凡事徹底</option>
+            </select>
+          </div>
+          <div class="field">
+            <label style="margin-bottom:15px;">10 Core Values (複数選択)</label>
+            <div class="values-grid" id="valuesCheckboxes"></div>
+          </div>
+          <div class="field" style="margin-top:25px;">
+            <label>投稿内容</label>
+            <textarea id="message" rows="5" required placeholder="具体的なエピソードを入力してください"></textarea>
+          </div>
+          <div class="field">
+            <label>ハッシュタグ</label>
+            <input type="text" id="tags" placeholder="#ありがとう #商売魂">
+          </div>
+          <button type="submit" class="btn-post">投稿を送信</button>
+        </form>
+      </section>
+      <div id="readonlyArea" style="display:none; text-align:center; padding:30px; border:2px dashed var(--orange); border-radius:20px; color:var(--orange); font-weight:bold;">
+        ⚠️ 過去期間を表示中のため、新規投稿はできません。
+      </div>
+    </main>
+
+    <aside>
+      <section class="panel">
+        <h3 style="margin-top:0;">トレンド (リアルタイム)</h3>
+        <div id="trendStats" style="font-size: 15px; line-height: 2.6;"></div>
+      </section>
+
+      <section class="panel">
+        <h3 style="margin-top:0;">部門別ランキング</h3>
+        <div class="rank-tabs">
+          <button class="tab-btn active" onclick="changeRank('THANKS', this)">🤝 THANKS</button>
+          <button class="tab-btn" onclick="changeRank('BUSINESS', this)">💰 商売</button>
+          <button class="tab-btn" onclick="changeRank('MVV', this)">🔥 MVV</button>
+          <button class="tab-btn" onclick="changeRank('OWNER', this)">💎 主体性</button>
+          <button class="tab-btn" onclick="changeRank('BONJI', this)">✨ 凡事</button>
+        </div>
+        <div id="rankingList"></div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, push, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+  // --- Firebase Config (差し替えてください) ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyC_2bIvYpfgKrgyfQ9YKE1CykpnxLfQi0k",
+    authDomain: "second-cc-culture-feed.firebaseapp.com",
+    databaseURL: "https://second-cc-culture-feed-default-rtdb.firebaseio.com",
+    projectId: "second-cc-culture-feed",
+    storageBucket: "second-cc-culture-feed.firebasestorage.app",
+    messagingSenderId: "1042140470022",
+    appId: "1:1042140470022:web:8d2a9de18d6d55060f9c87"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const postsRef = ref(db, 'posts');
+
+  const members = ["未選択", "安齋 慶人", "金井 裕之介", "中村 景一郎", "前田 拓真", "庄司 祐亮", "太田 魁晟", "高本 優", "白鳥 拓人", "柳沢 緋里", "和田 翔太郎", "斉藤 直文", "中川 春花", "三登 有夏", "金兒 胤栄", "山﨑 紀史", "茨 陸翔", "古田 大貴", "吉増 海斗"];
+  const coreValues = ["Speed 速度", "Change & Challenge 変化と挑戦", "Input & Output 学びと行動", "Priority 優先順位", "Continuous Outcome 継続的成果", "Responsibility 責任感", "Key Communication 本質的議論", "Team Work 共創", "Creativity 発想", "Long-term thinking 長期思考"];
+  const currentMonthKey = "2026-03";
+
+  // UI初期化
+  const f = document.getElementById('fromName'), t = document.getElementById('toName'), vGrid = document.getElementById('valuesCheckboxes');
+  members.forEach(m => { f.add(new Option(m, m)); t.add(new Option(m, m)); });
+  coreValues.forEach(v => { vGrid.innerHTML += `<label class="value-item"><input type="checkbox" name="cv" value="${v}">${v}</label>`; });
+
+  // 投稿送信
+  document.getElementById('cultureForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const checks = Array.from(document.querySelectorAll('input[name="cv"]:checked')).map(c => c.value);
+    const postData = {
+      from: f.value, to: t.value,
+      category: document.getElementById('category').value,
+      values: checks,
+      message: document.getElementById('message').value,
+      tags: document.getElementById('tags').value.split(' ').filter(v => v),
+      timestamp: serverTimestamp(),
+      dateKey: currentMonthKey,
+      reactions: { "👏": 0, "🔥": 0, "💰": 0 }
+    };
+    push(postsRef, postData).then(() => {
+      showThanksEffect();
+      e.target.reset();
+    });
+  });
+
+  function showThanksEffect() {
+    const div = document.createElement('div');
+    div.className = 'thanks-pop';
+    div.innerText = 'Thanks! ✨';
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 2000);
+  }
+
+  // データ同期
+  let currentRankCat = 'THANKS';
+  onValue(postsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+    updateView(data);
+  });
+
+  function updateView(data) {
+    const posts = Object.entries(data).reverse();
+    const val = document.getElementById('archiveSelect').value;
+    const filtered = posts.filter(([_, p]) => p.dateKey === val);
+    
+    if (val !== currentMonthKey) {
+      document.getElementById('postPanel').style.display = 'none';
+      document.getElementById('readonlyArea').style.display = 'block';
+    } else {
+      document.getElementById('postPanel').style.display = 'block';
+      document.getElementById('readonlyArea').style.display = 'none';
+    }
+
+    renderFeed(filtered);
+    renderStats(filtered);
+    renderRanking(filtered, currentRankCat);
+  }
+
+  function renderFeed(posts) {
+    const list = document.getElementById('feedList');
+    if(posts.length === 0) { list.innerHTML = "この期間の投稿はありません。"; return; }
+    list.innerHTML = posts.map(([id, p]) => `
+      <div class="post-card">
+        <div style="display:flex; justify-content:space-between; font-size:13px; opacity:0.8;">
+          <strong>${p.from} ➔ ${p.to}</strong>
+          <span>${p.category}</span>
+        </div>
+        <div style="margin:12px 0;">
+          ${p.values ? p.values.map(v => `<span style="color:var(--orange); font-size:11px; margin-right:10px;">#${v}</span>`).join('') : ''}
+          ${p.tags ? p.tags.map(tag => `<span style="font-size:11px; opacity:0.5; margin-right:8px;">${tag}</span>`).join('') : ''}
+        </div>
+        <div style="margin-bottom:20px; font-size:16px; line-height:1.7; white-space:pre-wrap;">${p.message}</div>
+        <div style="display:flex; gap:12px;">
+          ${Object.entries(p.reactions || {}).map(([emoji, count]) => `
+            <button style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer;" onclick="window.addReaction('${id}', '${emoji}', ${count})">${emoji} ${count}</button>
+          `).join('')}
+        </div>
+        <div id="replies-${id}">
+          ${p.replies ? Object.values(p.replies).map(r => `<div class="reply-item"><strong>${r.name}:</strong> ${r.text}</div>`).join('') : ''}
+        </div>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+          <input type="text" id="reply-text-${id}" placeholder="返信を送る..." style="padding:10px; font-size:13px; height:42px; margin:0;">
+          <button onclick="window.addReply('${id}')" style="background:var(--orange); border:none; border-radius:10px; padding:0 20px; cursor:pointer; color:black; font-weight:900;">送信</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderStats(posts) {
+    const cats = { THANKS:0, BUSINESS:0, MVV:0, OWNER:0, BONJI:0 };
+    posts.forEach(([_, p]) => cats[p.category]++);
+    document.getElementById('trendStats').innerHTML = `
+      この期間の総数: <strong style="font-size:24px; color:var(--orange);">${posts.length}</strong><br>
+      🤝 THANKS: ${cats.THANKS}<br>💰 商売: ${cats.BUSINESS}<br>
+      🔥 MVV: ${cats.MVV}<br>💎 主体性: ${cats.OWNER}<br>✨ 凡事徹底: ${cats.BONJI}
+    `;
+  }
+
+  function renderRanking(posts, cat) {
+    const scores = {};
+    posts.forEach(([_, p]) => {
+      if (p.category !== cat) return;
+      const target = p.to !== "未選択" ? p.to : p.from;
+      scores[target] = (scores[target] || 0) + 1;
+    });
+    const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]).slice(0, 5);
+    document.getElementById('rankingList').innerHTML = sorted.length ? sorted.map(([name, count], i) => `
+      <div style="display:flex; justify-content:space-between; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1);">
+        <span>${i+1}. ${name}</span><strong>${count} pts</strong>
+      </div>
+    `).join('') : "<div style='opacity:0.5; padding:20px;'>データなし</div>";
+  }
+
+  window.changeRank = (cat, btn) => {
+    currentRankCat = cat;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    onValue(postsRef, (s) => {
+      const all = Object.entries(s.val() || {}).reverse();
+      const filter = all.filter(([_, p]) => p.dateKey === document.getElementById('archiveSelect').value);
+      renderRanking(filter, cat);
+    }, {onlyOnce: true});
+  };
+
+  window.addReaction = (id, emoji, count) => {
+    update(ref(db, `posts/${id}/reactions`), { [emoji]: count + 1 });
+  };
+
+  window.addReply = (postId) => {
+    const text = document.getElementById(`reply-text-${postId}`).value;
+    if(!text) return;
+    push(ref(db, `posts/${postId}/replies`), { name: "メンバー", text, timestamp: serverTimestamp() });
+    document.getElementById(`reply-text-${postId}`).value = "";
+  };
+
+  document.getElementById('archiveSelect').addEventListener('change', () => {
+    onValue(postsRef, (s) => updateView(s.val() || {}), {onlyOnce: true});
+  });
+
+  // 超濃密な星空の生成
+  const sf = document.getElementById('starField');
+  for (let i = 0; i < 150; i++) {
+    const s = document.createElement('div');
+    s.className = 'twinkle-star';
+    const size = Math.random() * 3 + 1;
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.top = Math.random() * 100 + 'vh';
+    s.style.setProperty('--d', (Math.random() * 3 + 2) + 's');
+    s.style.animationDelay = Math.random() * 5 + 's';
+    sf.appendChild(s);
+  }
+
+  // 大量の流れ星
+  const starColors = ["#ffffff", "#fffde7", "#e1bee7", "#ff8c1a"];
+  setInterval(() => {
+    const s = document.createElement('div');
+    s.className = 'shooting-star';
+    s.style.left = (Math.random() * 110) + 'vw';
+    s.style.animationDuration = (Math.random() * 2 + 1.2) + 's';
+    s.style.background = `linear-gradient(to bottom, transparent, ${starColors[Math.floor(Math.random() * starColors.length)]})`;
+    s.style.height = (Math.random() * 120 + 80) + 'px';
+    sf.appendChild(s);
+    setTimeout(() => s.remove(), 4000);
+  }, 400);
+</script>
+</body>
+</html>
