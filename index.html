@@ -18,12 +18,14 @@
       overflow-x: hidden; min-height: 100vh;
     }
 
-    /* 背景演出：維持 */
+    /* --- 背景：多色銀河・星雲・星間雲 --- */
     .galaxy-container {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background: radial-gradient(circle at 15% 20%, rgba(120, 40, 200, 0.4), transparent 60%),
-                  radial-gradient(circle at 85% 80%, rgba(20, 80, 180, 0.3), transparent 60%),
-                  url('https://www.transparenttextures.com/patterns/stardust.png');
+      background: 
+        radial-gradient(circle at 15% 20%, rgba(120, 40, 200, 0.4), transparent 60%),
+        radial-gradient(circle at 85% 80%, rgba(20, 80, 180, 0.3), transparent 60%),
+        radial-gradient(ellipse at 50% 40%, rgba(180, 60, 40, 0.2), transparent 70%),
+        url('https://www.transparenttextures.com/patterns/stardust.png');
     }
     .twinkle-star { position: absolute; border-radius: 50%; opacity: 0; animation: twinkle var(--d) ease-in-out infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
@@ -35,6 +37,12 @@
       100% { opacity: 0; }
     }
 
+    /* --- 投稿演出：Thanksポップアップ --- */
+    .thanks-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 6rem; font-weight: 900; color: #fffde7; text-shadow: 0 0 50px #ffd700; z-index: 10000; pointer-events: none; animation: thanksFade 2.5s forwards; }
+    @keyframes thanksFade { 0% { opacity: 0; scale: 0.5; } 20% { opacity: 1; scale: 1.2; } 100% { opacity: 0; transform: translate(-50%, -70%); scale: 1; } }
+    .particle { position: fixed; pointer-events: none; z-index: 9999; animation: particle-move 2s ease-out forwards; }
+    @keyframes particle-move { 0% { opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)); opacity: 0; } }
+
     .container { width: 94%; max-width: 1250px; margin: 0 auto; position: relative; z-index: 10; padding-bottom: 80px; }
     header { text-align: center; padding: 30px 0 20px; }
     .main-title { font-size: clamp(2.8rem, 9vw, 5rem); font-weight: 900; letter-spacing: 8px; text-shadow: 0 0 40px var(--orange); margin: 0; }
@@ -45,23 +53,29 @@
 
     .panel { background: var(--glass); border: 1px solid rgba(255,255,255,0.15); border-radius: 32px; padding: 30px; margin-bottom: 30px; backdrop-filter: blur(25px); }
 
-    /* Seed Box（維持） */
-    #feedList { max-height: 800px; overflow-y: auto; padding-right: 15px; scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
-    .post-card { background: rgba(255,255,255,0.08); border-radius: 25px; padding: 25px; margin-bottom: 25px; border-left: 8px solid var(--orange); }
-    .post-header-info { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
-    .post-category-label { color: var(--orange); font-size: 18px; font-weight: bold; margin-bottom: 10px; display: block; }
+    /* ソートボタン */
+    .sort-area { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .sort-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-size: 13px; }
+    .sort-btn.active { background: var(--orange); color: #000; font-weight: bold; }
 
-    /* --- 修正：10 Core Values 整列 --- */
+    /* 10 Core Values */
     .values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 15px; margin: 10px 0; }
     .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
     .value-item input { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--orange); }
 
-    /* トレンド（修正） */
-    .trend-clickable { cursor: pointer; padding: 5px; border-radius: 8px; transition: 0.2s; }
-    .trend-clickable:hover { background: rgba(255,255,255,0.1); }
+    /* Seed Box（維持） */
+    #feedList { max-height: 800px; overflow-y: auto; padding-right: 15px; scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
+    .post-card { background: rgba(255,255,255,0.08); border-radius: 25px; padding: 25px; margin-bottom: 25px; border-left: 8px solid var(--orange); }
+    .post-header-info { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
+    .post-category-label { color: var(--orange); font-size: 22px; font-weight: 900; margin-bottom: 12px; display: block; }
 
     textarea, select, input[type="text"] { width: 100%; background: var(--input-bg); border: 1px solid #555; color: white; padding: 15px; border-radius: 12px; margin-top: 8px; font-size: 16px; outline: none; }
-    .btn-post { width: 100%; padding: 22px; background: linear-gradient(135deg, var(--orange), #ffcc80); color: #000; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; margin-top: 20px; font-size: 22px; }
+    .btn-post { width: 100%; padding: 22px; background: linear-gradient(135deg, var(--orange), #ffcc80); color: #000; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; margin-top: 30px; font-size: 22px; }
+
+    /* コメント・リアクション（維持） */
+    .reaction-btn { background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px 16px; border-radius: 99px; cursor: pointer; }
+    .reply-box { margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
+    .reply-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -80,10 +94,15 @@
       <section class="panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
           <h2 style="margin:0;">Seed Box</h2>
-          <select id="archiveSelect" style="width:auto; border:1px solid var(--orange); background:#000; color:var(--orange); border-radius:20px; padding:0 10px;">
+          <select id="archiveSelect" style="width:auto; height:40px; border-radius:20px; border:1px solid var(--orange); background:#000; color:var(--orange); padding:0 10px;">
             <option value="2026-03">2026年3月</option>
             <option value="2026-02">2026年2月</option>
           </select>
+        </div>
+        <div class="sort-area">
+          <button class="sort-btn active" id="sort-new" onclick="setSort('new')">✨ 新着順</button>
+          <button class="sort-btn" id="sort-stamp" onclick="setSort('stamp')">🔥 スタンプ順</button>
+          <button class="sort-btn" id="sort-comment" onclick="setSort('comment')">💬 コメント順</button>
         </div>
         <div id="feedList">同期中...</div>
       </section>
@@ -91,23 +110,25 @@
       <section class="panel">
         <h2 style="margin-top:0;">Sow Seeds</h2>
         <form id="cultureForm">
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
             <div><label>From</label><select id="fromName" required></select></div>
             <div><label>To</label><select id="toName"></select></div>
           </div>
-          <label>項目選択</label>
-          <select id="category">
-            <option value="🤝 Thanks">🤝 Thanks</option>
-            <option value="💰 商売を展開、商売を心から楽しむ">💰 商売を展開、商売を心から楽しむ</option>
-            <option value="🔥 MVVを体現">🔥 MVVを体現</option>
-            <option value="💎 主体性の発揮">💎 主体性の発揮</option>
-            <option value="✨ 凡事徹底">✨ 凡事徹底</option>
-          </select>
-          <div style="margin-top:20px;">
-            <label>10 Core Values (複数選択可)</label>
+          <div style="margin-top:15px;">
+            <label>項目選択</label>
+            <select id="category">
+              <option value="🤝 Thanks">🤝 Thanks</option>
+              <option value="💰 商売を展開、商売を心から楽しむ">💰 商売を展開、商売を心から楽しむ</option>
+              <option value="🔥 MVVを体現">🔥 MVVを体現</option>
+              <option value="💎 主体性の発揮">💎 主体性の発揮</option>
+              <option value="✨ 凡事徹底">✨ 凡事徹底</option>
+            </select>
+          </div>
+          <div style="margin-top:15px;">
+            <label>10 Core Values (複数選択)</label>
             <div class="values-grid" id="valuesCheckboxes"></div>
           </div>
-          <textarea id="message" rows="5" required placeholder="エピソードを入力してください..." style="margin-top:10px;"></textarea>
+          <textarea id="message" rows="5" required style="margin-top:20px;" placeholder="エピソードを入力してください..."></textarea>
           <button type="submit" class="btn-post">投稿を送信</button>
         </form>
       </section>
@@ -120,6 +141,10 @@
       </section>
       <section class="panel">
         <h3 style="margin-top:0; color:var(--orange);">今月のランキング</h3>
+        <select id="rankArchiveSelect" style="width:100%; height:45px; border-radius:12px; margin-bottom:20px; background:#000; color:var(--orange); border:1px solid var(--orange); padding:0 15px; font-weight:bold;">
+          <option value="2026-03">2026年3月のランキング</option>
+          <option value="2026-02">2026年2月のランキング</option>
+        </select>
         <div id="rankingList"></div>
       </section>
     </aside>
@@ -146,8 +171,8 @@
 
   const members = ["第二全体", "未選択", "安齋 慶人", "金井 裕之介", "中村 景一郎", "前田 拓真", "庄司 祐亮", "太田 魁晟", "高本 優", "白鳥 拓人", "柳沢 緋里", "和田 翔太郎", "斉藤 直文", "中川 春花", "三登 有夏", "金兒 胤栄", "山﨑 紀史", "茨 陸翔", "古田 大貴", "吉増 海斗"];
   const coreValues = ["Speed 速度", "Change & Challenge 変化と挑戦", "Input & Output 学びと行動", "Priority 優先順位", "Continuous Outcome 継続的成果", "Responsibility 責任感", "Key Communication 本質的議論", "Team Work 共創", "Creativity 発想", "Long-term thinking 長期思考"];
-  const categories = ["🤝 Thanks", "💰 商売を展開、商売を心から楽しむ", "🔥 MVVを体現", "💎 主体性の発揮", "✨ 凡事徹底"];
   let rawData = {};
+  let sortMode = 'new';
 
   const f = document.getElementById('fromName'), t = document.getElementById('toName'), vGrid = document.getElementById('valuesCheckboxes');
   members.forEach(m => { f.add(new Option(m, m)); t.add(new Option(m, m)); });
@@ -157,70 +182,92 @@
 
   function refreshUI() {
     const boxMonth = document.getElementById('archiveSelect').value;
-    const posts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === boxMonth).reverse();
+    const rankMonth = document.getElementById('rankArchiveSelect').value;
     
-    // Seed Box 修正箇所
+    let posts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === boxMonth);
+    if (sortMode === 'stamp') posts.sort((a, b) => (Object.values(b.reactions||{}).reduce((s,c)=>s+c,0)) - (Object.values(a.reactions||{}).reduce((s,c)=>s+c,0)));
+    else if (sortMode === 'comment') posts.sort((a, b) => Object.keys(b.replies||{}).length - Object.keys(a.replies||{}).length);
+    else posts.reverse();
+
+    renderFeed(posts);
+    const rPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === rankMonth);
+    renderStats(rPosts);
+    renderRanking(rPosts);
+  }
+
+  function renderFeed(posts) {
     document.getElementById('feedList').innerHTML = posts.map(p => `
       <div class="post-card">
         <div class="post-header-info">${p.from} ➔ ${p.to}</div>
         <span class="post-category-label">${p.category}</span>
-        <div style="margin:15px 0; font-size:16px; line-height:1.7; white-space:pre-wrap;">${p.message}</div>
+        <div style="margin:10px 0; color:var(--orange); font-size:12px;">${p.values ? p.values.map(v=>'#'+v.split(' ')[0]).join(' ') : ''}</div>
+        <div style="margin:15px 0; font-size:18px; line-height:1.7; white-space:pre-wrap;">${p.message}</div>
         <div style="display:flex; gap:10px;">
-          ${Object.entries(p.reactions || {"👏":0, "🔥":0, "💰":0}).map(([emoji, count]) => `
-            <button style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer;" onclick="window.react('${p.id}','${emoji}',${count})">${emoji} ${count}</button>
-          `).join('')}
+          ${Object.entries(p.reactions || {"👏":0, "🔥":0, "💰":0}).map(([emoji, count]) => `<button class="reaction-btn" onclick="window.addReaction('${p.id}','${emoji}',${count})">${emoji} ${count}</button>`).join('')}
+          <button class="reaction-btn" onclick="window.promptEmoji('${p.id}')">＋</button>
+        </div>
+        <div class="reply-box">
+          ${p.replies ? Object.values(p.replies).map(r => `<div class="reply-item">${r.text}</div>`).join('') : ''}
+          <div style="display:flex; gap:10px; margin-top:10px;">
+            <input type="text" id="re-${p.id}" placeholder="返信..." style="height:40px; margin:0; font-size:13px;">
+            <button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:10px; padding:0 20px; cursor:pointer; color:black; font-weight:bold;">送信</button>
+          </div>
         </div>
       </div>
     `).join('') || "種がありません";
-
-    // トレンド 修正箇所
-    const catsCount = {}; categories.forEach(c => catsCount[c] = 0);
-    const scores = {};
-    posts.forEach(p => {
-      if(catsCount[p.category] !== undefined) catsCount[p.category]++;
-      const target = p.to !== "未選択" ? p.to : p.from;
-      scores[target] = (scores[target] || 0) + 1;
-    });
-    
-    document.getElementById('trendStats').innerHTML = `<div style="font-size:22px; color:var(--orange); font-weight:bold; margin-bottom:10px;">Total: ${posts.length}</div>` + 
-      categories.map(c => `<div class="trend-clickable" onclick="alert('${c}の投稿数: ${catsCount[c]}')">${c}: ${catsCount[c]}</div>`).join('');
-
-    const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0, 8);
-    document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`<div style="font-size:18px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${i+1}. ${n}</span><strong>${c} pt</strong></div>`).join('') || "No Data";
   }
 
-  window.react = (id, e, c) => update(ref(db, `posts/${id}/reactions`), { [e]: c + 1 });
+  function renderStats(posts) {
+    const cats = {"🤝 Thanks":0, "💰 商売を展開、商売を心から楽しむ":0, "🔥 MVVを体現":0, "💎 主体性の発揮":0, "✨ 凡事徹底":0};
+    posts.forEach(p => { if(cats[p.category] !== undefined) cats[p.category]++; });
+    document.getElementById('trendStats').innerHTML = `<div style="font-size:24px; color:var(--orange); font-weight:bold;">Total: ${posts.length}</div>` + 
+      Object.entries(cats).map(([label, count]) => `<div style="cursor:pointer" onclick="alert('${label}')">${label}: ${count}</div>`).join('');
+  }
+
+  function renderRanking(posts) {
+    const scores = {};
+    posts.forEach(p => { const target = p.to !== "未選択" ? p.to : p.from; scores[target] = (scores[target] || 0) + 1; });
+    const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0, 8);
+    document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${i+1}. ${n}</span><strong>${c} pt</strong></div>`).join('');
+  }
+
+  window.setSort = (m) => { sortMode = m; document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active')); document.getElementById(`sort-${m}`).classList.add('active'); refreshUI(); };
+  window.addReaction = (id, emoji, count) => update(ref(db, `posts/${id}/reactions`), { [emoji]: count + 1 });
+  window.promptEmoji = (id) => { const e = prompt("絵文字を入力:"); if(e) window.addReaction(id, e, 0); };
+  window.addReply = (id) => { const t = document.getElementById(`re-${id}`).value; if(t) { push(ref(db, `posts/${id}/replies`), { text: t, timestamp: serverTimestamp() }); document.getElementById(`re-${id}`).value = ""; } };
 
   document.getElementById('cultureForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    const now = new Date();
-    const autoDateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const checks = Array.from(document.querySelectorAll('input[name="cv"]:checked')).map(c => c.value);
-    
-    // Core Values をハッシュタグとしてメッセージの末尾に追加
-    let finalMessage = document.getElementById('message').value;
-    if(checks.length > 0) {
-      finalMessage += "\n\n" + checks.map(v => "#" + v.split(' ')[0]).join(' ');
-    }
-
-    push(postsRef, { 
-      from: f.value, 
-      to: t.value, 
-      category: document.getElementById('category').value, 
-      message: finalMessage, 
-      timestamp: serverTimestamp(), 
-      dateKey: autoDateKey 
-    }).then(() => { e.target.reset(); });
+    const now = new Date();
+    const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    push(postsRef, { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey })
+    .then(() => { e.target.reset(); triggerThanksEffect(); });
   });
 
-  document.getElementById('archiveSelect').addEventListener('change', refreshUI);
+  function triggerThanksEffect() {
+    const t = document.createElement('div'); t.className = 'thanks-popup'; t.innerText = 'Thanks! ✨';
+    document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
+    const items = ["🌸", "🌼", "✨", "⭐", "☆"];
+    for(let i=0; i<40; i++) {
+      const p = document.createElement('div'); p.className = 'particle'; p.innerText = items[Math.floor(Math.random()*items.length)];
+      p.style.left = '50%'; p.style.top = '50%';
+      p.style.setProperty('--tx', (Math.random()-0.5)*1000+'px'); p.style.setProperty('--ty', (Math.random()-0.5)*1000+'px');
+      p.style.setProperty('--tr', Math.random()*720+'deg');
+      document.body.appendChild(p); setTimeout(() => p.remove(), 2000);
+    }
+  }
 
-  // 背景：維持
+  document.getElementById('archiveSelect').addEventListener('change', refreshUI);
+  document.getElementById('rankArchiveSelect').addEventListener('change', refreshUI);
+
   const sf = document.getElementById('starField');
-  for(let i=0; i<200; i++) {
+  const starColors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0"];
+  for(let i=0; i<250; i++) {
     const s = document.createElement('div'); s.className = 'twinkle-star';
-    s.style.width = s.style.height = (Math.random()*2.5+0.5)+'px';
-    s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*120+'vh';
+    s.style.width = s.style.height = (Math.random()*3+1)+'px';
+    s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*150+'vh';
+    s.style.background = starColors[Math.floor(Math.random()*starColors.length)];
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
   setInterval(() => {
@@ -228,7 +275,7 @@
     s.style.left = Math.random()*110+'vw'; s.style.animationDuration = (Math.random()*1.2+0.8)+'s';
     s.style.background = 'linear-gradient(to bottom, transparent, #fff)'; sf.appendChild(s);
     setTimeout(() => s.remove(), 2500);
-  }, 400);
+  }, 300);
 </script>
 </body>
 </html>
