@@ -37,6 +37,22 @@
       100% { opacity: 0; }
     }
 
+    /* 追加：右下の浮遊する宇宙飛行士 */
+    .floating-astronaut {
+      position: fixed;
+      right: 5%;
+      bottom: 50px;
+      width: 180px;
+      z-index: 5;
+      pointer-events: none;
+      animation: float-astro 6s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(255, 140, 26, 0.3));
+    }
+    @keyframes float-astro {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(10deg); }
+    }
+
     /* Thanks演出 */
     .thanks-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 6rem; font-weight: 900; color: #fffde7; text-shadow: 0 0 50px #ffd700; z-index: 10000; pointer-events: none; animation: thanksFade 2.5s forwards; }
     @keyframes thanksFade { 0% { opacity: 0; scale: 0.5; } 20% { opacity: 1; scale: 1.2; } 100% { opacity: 0; transform: translate(-50%, -70%); scale: 1; } }
@@ -76,6 +92,8 @@
 
 <div class="galaxy-container"></div>
 <div id="starField"></div>
+
+<img src="https://cdn.pixabay.com/photo/2021/01/29/14/41/spaceman-5961205_1280.png" class="floating-astronaut" alt="astronaut">
 
 <div class="container">
   <header>
@@ -191,7 +209,6 @@
   }
 
   function renderFeed(posts) {
-    /* 修正：リアクションボタンを固定の5項目（絵文字＋テキスト）に変更 */
     const fixedReactions = [
       {emoji: "🤝", label: "Thanks"},
       {emoji: "💰", label: "商売"},
