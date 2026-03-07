@@ -41,6 +41,8 @@
     }
 
     .container { width: 94%; max-width: 1250px; margin: 0 auto; position: relative; z-index: 10; padding-bottom: 80px; }
+    
+    /* ヘッダー位置の最適化 */
     header { text-align: center; padding: 30px 0 20px; }
     .main-title { font-size: clamp(2.8rem, 9vw, 5rem); font-weight: 900; letter-spacing: 8px; text-shadow: 0 0 40px var(--orange); margin: 0; }
     .emoji-growth { font-size: 2rem; margin-top: 10px; letter-spacing: 15px; }
@@ -53,6 +55,7 @@
       border-radius: 32px; padding: 30px; margin-bottom: 30px; backdrop-filter: blur(25px);
     }
 
+    /* フィードエリアのスクロール固定 */
     #feedList {
       max-height: 700px; overflow-y: auto; padding-right: 15px;
       scrollbar-width: thin; scrollbar-color: var(--orange) transparent;
@@ -60,12 +63,28 @@
     #feedList::-webkit-scrollbar { width: 6px; }
     #feedList::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 10px; }
 
+    /* ソートボタン */
+    .sort-area { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .sort-btn {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: white; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-size: 13px;
+    }
+    .sort-btn.active { background: var(--orange); color: #000; font-weight: bold; border-color: var(--orange); }
+
+    /* Core Valuesの整列 */
     .values-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
       background: rgba(0,0,0,0.5); padding: 20px; border-radius: 18px; margin-top: 10px;
     }
     .value-item { display: flex; align-items: center; font-size: 14px; cursor: pointer; }
     .value-item input { width: 20px; height: 20px; margin-right: 12px; accent-color: var(--orange); }
+
+    /* Sow Seeds入力欄の拡大 */
+    .form-label { font-size: 16px; font-weight: bold; margin-bottom: 5px; display: block; }
+    textarea, select, input[type="text"] {
+      width: 100%; background: var(--input-bg); border: 1px solid #555; color: white;
+      padding: 18px; border-radius: 14px; margin-top: 8px; font-size: 18px; outline: none;
+    }
 
     .btn-post {
       width: 100%; padding: 22px; background: linear-gradient(135deg, var(--orange), #ffcc80);
@@ -75,16 +94,11 @@
 
     .post-card { background: rgba(255,255,255,0.08); border-radius: 25px; padding: 25px; margin-bottom: 25px; border-left: 8px solid var(--orange); }
     
-    /* 返信エリアのデザイン維持 */
     .reply-box {
       margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;
     }
     .reply-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; font-size: 13px; }
 
-    textarea, select, input[type="text"] {
-      width: 100%; background: var(--input-bg); border: 1px solid #555; color: white;
-      padding: 15px; border-radius: 12px; margin-top: 8px; font-size: 16px; outline: none;
-    }
   </style>
 </head>
 <body>
@@ -109,6 +123,13 @@
             <option value="2026-02">2026年2月</option>
           </select>
         </div>
+
+        <div class="sort-area">
+          <button class="sort-btn active" id="sort-new" onclick="setSort('new')">✨ 新着順</button>
+          <button class="sort-btn" id="sort-stamp" onclick="setSort('stamp')">🔥 スタンプ順</button>
+          <button class="sort-btn" id="sort-comment" onclick="setSort('comment')">💬 コメント順</button>
+        </div>
+
         <div id="feedList">銀河を同期中...</div>
       </section>
 
@@ -116,10 +137,10 @@
         <h2 style="margin-top:0;">Sow Seeds</h2>
         <form id="cultureForm">
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:15px;">
-            <div><label>From</label><select id="fromName" required></select></div>
-            <div><label>To</label><select id="toName"></select></div>
+            <div><label class="form-label">From</label><select id="fromName" required></select></div>
+            <div><label class="form-label">To</label><select id="toName"></select></div>
           </div>
-          <label>Category</label>
+          <label class="form-label">Category</label>
           <select id="category">
             <option value="Thanks">🤝 Thanks</option>
             <option value="Business">💰 商売を楽しむ</option>
@@ -128,7 +149,7 @@
             <option value="Bonji">✨ 凡事徹底</option>
           </select>
           <div style="margin-top:15px;">
-            <label>10 Core Values</label>
+            <label class="form-label">10 Core Values</label>
             <div class="values-grid" id="valuesCheckboxes"></div>
           </div>
           <textarea id="message" rows="5" required style="margin-top:20px;" placeholder="エピソードを入力してください..."></textarea>
@@ -172,17 +193,32 @@
   const members = ["未選択", "安齋 慶人", "金井 裕之介", "中村 景一郎", "前田 拓真", "庄司 祐亮", "太田 魁晟", "高本 優", "白鳥 拓人", "柳沢 緋里", "和田 翔太郎", "斉藤 直文", "中川 春花", "三登 有夏", "金兒 胤栄", "山﨑 紀史", "茨 陸翔", "古田 大貴", "吉増 海斗"];
   const coreValues = ["Speed 速度", "Change & Challenge 変化と挑戦", "Input & Output 学びと行動", "Priority 優先順位", "Continuous Outcome 継続的成果", "Responsibility 責任感", "Key Communication 本質的議論", "Team Work 共創", "Creativity 発想", "Long-term thinking 長期思考"];
   let rawData = {};
+  let sortMode = 'new';
 
   const f = document.getElementById('fromName'), t = document.getElementById('toName'), vGrid = document.getElementById('valuesCheckboxes');
   members.forEach(m => { f.add(new Option(m, m)); t.add(new Option(m, m)); });
   coreValues.forEach(v => { vGrid.innerHTML += `<label class="value-item"><input type="checkbox" name="cv" value="${v}">${v}</label>`; });
 
+  // データ取得
   onValue(postsRef, (s) => { rawData = s.val() || {}; refreshUI(); });
 
   function refreshUI() {
-    const val = document.getElementById('archiveSelect').value;
-    const posts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === val).reverse();
+    const selectedMonth = document.getElementById('archiveSelect').value;
     
+    // データのフィルタリングと並び替え
+    let posts = Object.entries(rawData)
+      .map(([id, p]) => ({ id, ...p }))
+      .filter(p => p.dateKey === selectedMonth);
+
+    if (sortMode === 'stamp') {
+      posts.sort((a, b) => (Object.values(b.reactions || {}).reduce((s,c)=>s+c,0)) - (Object.values(a.reactions || {}).reduce((s,c)=>s+c,0)));
+    } else if (sortMode === 'comment') {
+      posts.sort((a, b) => Object.keys(b.replies || {}).length - Object.keys(a.replies || {}).length);
+    } else {
+      posts.reverse();
+    }
+    
+    // フィードの描画
     document.getElementById('feedList').innerHTML = posts.map(p => `
       <div class="post-card">
         <div style="display:flex; justify-content:space-between; font-size:12px; opacity:0.7;">
@@ -205,9 +241,9 @@
           </div>
         </div>
       </div>
-    `).join('') || "まだ種がまかれていません。";
+    `).join('') || `<div style="text-align:center; opacity:0.5; padding:20px;">${selectedMonth} の種はまだありません。</div>`;
 
-    // 統計・ランキング表示維持
+    // 統計・ランキング表示
     const cats = { Thanks:0, Business:0, MVV:0, Owner:0, Bonji:0 };
     const scores = {};
     posts.forEach(p => { 
@@ -221,22 +257,35 @@
     const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0, 8);
     document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`
       <div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;">
-        <span>${i+1}. ${name}</span><strong>${c} pt</strong>
+        <span>${i+1}. ${n}</span><strong>${c} pt</strong>
       </div>
     `).join('') || "No data";
   }
 
+  // グローバル関数
+  window.setSort = (m) => {
+    sortMode = m;
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`sort-${m}`).classList.add('active');
+    refreshUI();
+  };
   window.addReaction = (id, emoji, count) => update(ref(db, `posts/${id}/reactions`), { [emoji]: count + 1 });
   window.promptEmoji = (id) => { const e = prompt("好きな絵文字を入力してください:"); if(e) window.addReaction(id, e, 0); };
   window.addReply = (id) => { const t = document.getElementById(`re-${id}`).value; if(t) { push(ref(db, `posts/${id}/replies`), { text: t, timestamp: serverTimestamp() }); document.getElementById(`re-${id}`).value = ""; } };
 
+  // 投稿送信
   document.getElementById('cultureForm').addEventListener('submit', (e) => {
     e.preventDefault();
+    const now = new Date();
+    const autoDateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const checks = Array.from(document.querySelectorAll('input[name="cv"]:checked')).map(c => c.value);
-    push(postsRef, { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: "2026-03" }).then(() => e.target.reset());
+    push(postsRef, { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: autoDateKey }).then(() => e.target.reset());
   });
 
-  // --- 銀河と大量の流れ星（演出強化） ---
+  // 月切り替えイベント
+  document.getElementById('archiveSelect').addEventListener('change', refreshUI);
+
+  // --- 演出：銀河と流れ星 ---
   const sf = document.getElementById('starField');
   for(let i=0; i<180; i++) {
     const s = document.createElement('div'); s.className = 'twinkle-star';
