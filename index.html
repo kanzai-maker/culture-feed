@@ -135,7 +135,7 @@
         <div id="trendStats" style="font-size:16px; line-height:2.2;"></div>
       </section>
       <section class="panel">
-        <h3 style="margin-top:0; color:var(--orange);">今月のランキング</h3>
+        <h3 style="margin-top:0; color:var(--orange);">今月の投稿ランキング</h3>
         <select id="rankArchiveSelect" style="width:100%; height:45px; border-radius:12px; margin-bottom:20px; background:#000; color:var(--orange); border:1px solid var(--orange); padding:0 15px; font-weight:bold;">
           <option value="2026-03">2026年3月のランキング</option>
           <option value="2026-02">2026年2月のランキング</option>
@@ -163,6 +163,9 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
   const postsRef = ref(db, 'posts');
+
+  /* 追加：提供されたGASウェブアプリURLを設定 */
+  const GAS_WEBAPP_URL = "https://script.google.com/a/macros/marketenterprise.co.jp/s/AKfycbxbD8oEoRBUd69nclTVtRcVRMeRG_HpbaqSIkvs06uVo7GG56GIE5rU_RWSXd__0A1G/exec";
 
   const members = ["第二全体", "未選択", "安齋 慶人", "金井 裕之介", "中村 景一郎", "前田 拓真", "庄司 祐亮", "太田 魁晟", "高本 優", "白鳥 拓人", "柳沢 緋里", "和田 翔太郎", "斉藤 直文", "中川 春花", "三登 有夏", "金兒 胤栄", "山﨑 紀史", "茨 陸翔", "古田 大貴", "吉増 海斗"];
   const coreValues = ["Speed 速度", "Change & Challenge 変化と挑戦", "Input & Output 学びと行動", "Priority 優先順位", "Continuous Outcome 継続的成果", "Responsibility 責任感", "Key Communication 本質的議論", "Team Work 共創", "Creativity 発想", "Long-term thinking 長期思考"];
@@ -233,10 +236,17 @@
   }
 
   function renderRanking(posts) {
+    /* 修正：投稿した人（From）の数が多い順のランキングにロジック変更 */
     const scores = {};
-    posts.forEach(p => { const target = p.to !== "未選択" ? p.to : p.from; scores[target] = (scores[target] || 0) + 1; });
+    posts.forEach(p => { 
+      const sender = p.from;
+      // 「未選択」や「第二全体」は除外
+      if(sender !== "未選択" && sender !== "第二全体") {
+        scores[sender] = (scores[sender] || 0) + 1; 
+      }
+    });
     const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0, 8);
-    document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${i+1}. ${n}</span><strong>${c} pt</strong></div>`).join('') || "No Data";
+    document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${i+1}. ${n}</span><strong>${c} seeds</strong></div>`).join('') || "No Data";
   }
 
   window.setSort = (m) => { sortMode = m; document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active')); document.getElementById(`sort-${m}`).classList.add('active'); refreshUI(); };
@@ -244,14 +254,49 @@
   window.promptEmoji = (id) => { const e = prompt("絵文字を入力:"); if(e) window.addReaction(id, e, 0); };
   window.addReply = (id) => { const t = document.getElementById(`re-${id}`).value; if(t) { push(ref(db, `posts/${id}/replies`), { text: t, timestamp: serverTimestamp() }); document.getElementById(`re-${id}`).value = ""; } };
 
+  /* 追加：スプレッドシートへのデータ送信関数 */
+  async function sendToSpreadsheet(data) {
+    if(!GAS_WEBAPP_URL) return;
+    try {
+      await fetch(GAS_WEBAPP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+    } catch (e) { console.error("Sync Error:", e); }
+  }
+
   document.getElementById('cultureForm').addEventListener('submit', (e) => {
     e.preventDefault();
     /* 10 Core Valuesの選択内容を取得：維持 */
     const checks = Array.from(document.querySelectorAll('input[name="cv"]:checked')).map(c => c.value);
     const now = new Date();
     const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    push(postsRef, { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey })
-    .then(() => { e.target.reset(); triggerThanksEffect(); });
+    const displayDate = now.toLocaleString('ja-JP');
+
+    const postData = { 
+      from: f.value, 
+      to: t.value, 
+      category: document.getElementById('category').value, 
+      values: checks, 
+      message: document.getElementById('message').value, 
+      timestamp: serverTimestamp(), 
+      dateKey: dateKey 
+    };
+
+    push(postsRef, postData)
+    .then(() => { 
+      /* 追加：Firebase保存後にスプレッドシートへも送信 */
+      sendToSpreadsheet({ 
+        type: "post", 
+        displayDate: displayDate,
+        ...postData,
+        values: checks.join(', ') // スプレッドシート用にカンマ区切りに変換
+      });
+      e.target.reset(); 
+      triggerThanksEffect(); 
+    });
   });
 
   function triggerThanksEffect() {
