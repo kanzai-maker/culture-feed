@@ -18,31 +18,35 @@
       overflow-x: hidden; min-height: 100vh;
     }
 
-    /* 修正：背景演出の強化（銀河・星屑） */
+    /* 修正：銀河・天の川演出の強化 */
     .galaxy-container {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: 
-        radial-gradient(circle at 15% 20%, rgba(120, 40, 200, 0.4), transparent 60%),
-        radial-gradient(circle at 85% 80%, rgba(20, 80, 180, 0.3), transparent 60%),
-        radial-gradient(ellipse at 50% 40%, rgba(180, 60, 40, 0.2), transparent 70%),
+        radial-gradient(circle at 20% 30%, rgba(120, 40, 200, 0.5), transparent 70%),
+        radial-gradient(circle at 80% 70%, rgba(20, 80, 180, 0.4), transparent 70%),
+        radial-gradient(ellipse at 50% 50%, rgba(180, 60, 40, 0.25), transparent 80%),
         url('https://www.transparenttextures.com/patterns/stardust.png');
     }
-    /* 追加：星屑の揺らぎ演出 */
-    .nebula {
-      position: fixed; inset: 0;
-      background: radial-gradient(circle at center, rgba(255,255,255,0.05) 0%, transparent 70%);
-      animation: nebulaPulse 10s ease-in-out infinite;
-      z-index: 0; pointer-events: none;
+    
+    /* 追加：回転する星屑レイヤー */
+    .stardust-layer {
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      background-image: radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)), radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0));
+      background-size: 200px 200px;
+      animation: rotateStardust 120s linear infinite;
+      opacity: 0.3; z-index: 0; pointer-events: none;
     }
-    @keyframes nebulaPulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.5; } }
+    @keyframes rotateStardust { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
     .twinkle-star { position: absolute; border-radius: 50%; opacity: 0; animation: twinkle var(--d) ease-in-out infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
-    .shooting-star { position: absolute; top: -150px; width: 2px; opacity: 0; animation: shoot linear infinite; }
-    @keyframes shoot {
-      0% { transform: translate(100vw, 0) rotate(35deg); opacity: 0; }
-      15% { opacity: 1; }
-      45% { transform: translate(-20vw, 120vh) rotate(35deg); opacity: 0; }
+
+    /* 修正：流れ星を右上から左下へ（頻度向上） */
+    .shooting-star { position: absolute; width: 2px; height: 2px; background: #fff; opacity: 0; animation: shoot-diag linear infinite; }
+    @keyframes shoot-diag {
+      0% { transform: translate(120vw, -10vh) rotate(-45deg) scaleX(0); opacity: 0; }
+      10% { opacity: 1; scaleX(30); }
+      30% { transform: translate(-20vw, 110vh) rotate(-45deg) scaleX(30); opacity: 0; }
       100% { opacity: 0; }
     }
 
@@ -80,15 +84,23 @@
     .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
     .value-item input { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--orange); }
 
-    /* 追加：宇宙飛行士アニメーション */
-    .astronaut-container { text-align: center; margin-top: 20px; animation: float 6s ease-in-out infinite; }
-    @keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-20px) rotate(5deg); } }
+    /* 修正：宇宙飛行士・宇宙人・ロケットの浮遊演出 */
+    .space-group { position: relative; height: 180px; margin-top: 20px; }
+    .float-item { position: absolute; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
+    
+    .astro { left: 30%; animation: floatAstro 5s ease-in-out infinite; }
+    .alien { left: 10%; top: 60px; animation: floatAlien 4s ease-in-out infinite; transform: scale(0.7); }
+    .rocket { right: 15%; top: 20px; animation: floatRocket 7s ease-in-out infinite; transform: rotate(-20deg) scale(0.6); }
+
+    @keyframes floatAstro { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-15px) rotate(5deg); } }
+    @keyframes floatAlien { 0%, 100% { transform: translate(0,0) rotate(0); } 50% { transform: translate(5px, 10px) rotate(-10deg); } }
+    @keyframes floatRocket { 0%, 100% { transform: translate(0,0) rotate(-20deg); } 50% { transform: translate(-10px, -5px) rotate(-15deg); } }
   </style>
 </head>
 <body>
 
 <div class="galaxy-container"></div>
-<div class="nebula"></div>
+<div class="stardust-layer"></div>
 <div id="starField"></div>
 
 <div class="container">
@@ -153,14 +165,26 @@
         <div id="rankingList"></div>
       </section>
 
-      <div class="astronaut-container">
-        <svg width="150" height="150" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C10.34 2 9 3.34 9 5V6.17C7.23 6.64 6 8.24 6 10V14C6 14.55 6.45 15 7 15H17C17.55 15 18 14.55 18 14V10C18 8.24 16.77 6.64 15 6.17V5C15 3.34 13.66 2 12 2Z" fill="#E0E0E0"/>
-          <path d="M9 10H15V13H9V10Z" fill="#333"/>
-          <path d="M7 16V19C7 20.1 7.9 21 9 21H10V18H14V21H15C16.1 21 17 20.1 17 19V16H7Z" fill="#E0E0E0"/>
-          <circle cx="12" cy="5" r="1" fill="#FF8C1A"/>
-        </svg>
-        <div style="color:var(--orange); font-size:12px; margin-top:5px; font-weight:bold; opacity:0.8;">EXPLORING CULTURE...</div>
+      <div class="space-group">
+        <div class="float-item alien">
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="#64ffda">
+            <path d="M12 2a7 7 0 0 0-7 7c0 3 2.5 5.5 5.5 5.9V19a1 1 0 1 0 2 0v-4.1c3-.4 5.5-3 5.5-5.9a7 7 0 0 0-7-7zm-3 7a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm6 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0z"/>
+            <path d="M6 20a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm12 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-6 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+          </svg>
+        </div>
+        <div class="float-item astro">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="#fff">
+            <path d="M12 1a5 5 0 0 0-5 5v2h10V6a5 5 0 0 0-5-5zM7 9v6h2v-4h1v4h2v-4h1v4h2v-4h1v4h2V9H7z" opacity="0.9"/>
+            <rect x="9" y="4" width="6" height="3" rx="1" fill="#333"/>
+            <circle cx="12" cy="18" r="3" fill="#eee"/>
+          </svg>
+        </div>
+        <div class="float-item rocket">
+          <svg width="50" height="50" viewBox="0 0 24 24" fill="#ff5252">
+            <path d="M12 2.5s-5 4-5 10.5c0 2 1 3.5 1 3.5h8s1-1.5 1-3.5c0-6.5-5-10.5-5-10.5zM9 19l-1 2h8l-1-2H9z"/>
+          </svg>
+        </div>
+        <div style="position:absolute; bottom:0; width:100%; text-align:center; color:var(--orange); font-size:14px; font-weight:bold; letter-spacing:2px;">文化醸成中...</div>
       </div>
     </aside>
   </div>
@@ -191,27 +215,19 @@
   let rawData = {};
   let sortMode = 'new';
 
-  /* 追加：アーカイブ選択肢を自動生成する関数 */
   function setupArchiveOptions() {
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1;
     const currentDate = now.getDate();
-    
     const targets = [document.getElementById('archiveSelect'), document.getElementById('rankArchiveSelect')];
-    
-    // 30日以降なら翌月も追加
     let months = [];
     if (currentDate >= 30) {
       const nextDate = new Date(currentYear, currentMonth, 1);
       months.push(`${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}`);
     }
-    
-    // 今月
     const thisMonthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
     months.push(thisMonthKey);
-    
-    // 先月
     const lastDate = new Date(currentYear, currentMonth - 2, 1);
     months.push(`${lastDate.getFullYear()}-${String(lastDate.getMonth() + 1).padStart(2, '0')}`);
     
@@ -220,7 +236,6 @@
         const [y, mm] = m.split('-');
         return `<option value="${m}">${y}年${parseInt(mm)}月${select.id === 'rankArchiveSelect' ? 'のランキング' : ''}</option>`;
       }).join('');
-      // デフォルトは今月を選択
       select.value = thisMonthKey;
     });
   }
@@ -235,12 +250,10 @@
   function refreshUI() {
     const boxMonth = document.getElementById('archiveSelect').value;
     const rankMonth = document.getElementById('rankArchiveSelect').value;
-    
     let feedPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === boxMonth);
     if (sortMode === 'stamp') feedPosts.sort((a, b) => (Object.values(b.reactions||{}).reduce((s,c)=>s+c,0)) - (Object.values(a.reactions||{}).reduce((s,c)=>s+c,0)));
     else if (sortMode === 'comment') feedPosts.sort((a, b) => Object.keys(b.replies||{}).length - Object.keys(a.replies||{}).length);
     else feedPosts.reverse();
-
     renderFeed(feedPosts);
     const rPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === rankMonth);
     renderStats(rPosts);
@@ -248,14 +261,7 @@
   }
 
   function renderFeed(posts) {
-    const fixedReactions = [
-      {emoji: "🤝", label: "Thanks"},
-      {emoji: "💰", label: "商売"},
-      {emoji: "🔥", label: "MVV"},
-      {emoji: "💎", label: "主体者"},
-      {emoji: "✨", label: "凡事徹底"}
-    ];
-
+    const fixedReactions = [{emoji: "🤝", label: "Thanks"},{emoji: "💰", label: "商売"},{emoji: "🔥", label: "MVV"},{emoji: "💎", label: "主体者"},{emoji: "✨", label: "凡事徹底"}];
     document.getElementById('feedList').innerHTML = posts.map(p => `
       <div class="post-card">
         <div class="post-header-info">${p.from} ➔ ${p.to}</div>
@@ -291,9 +297,7 @@
     const scores = {};
     posts.forEach(p => { 
       const sender = p.from;
-      if(sender !== "未選択" && sender !== "第二全体") {
-        scores[sender] = (scores[sender] || 0) + 1; 
-      }
+      if(sender !== "未選択" && sender !== "第二全体") scores[sender] = (scores[sender] || 0) + 1; 
     });
     const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0, 8);
     document.getElementById('rankingList').innerHTML = sorted.map(([n,c],i)=>`<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${i+1}. ${n}</span><strong>${c} seeds</strong></div>`).join('') || "No Data";
@@ -307,12 +311,7 @@
   async function sendToSpreadsheet(data) {
     if(!GAS_WEBAPP_URL) return;
     try {
-      await fetch(GAS_WEBAPP_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
+      await fetch(GAS_WEBAPP_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
     } catch (e) { console.error("Sync Error:", e); }
   }
 
@@ -322,31 +321,12 @@
     const now = new Date();
     const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const displayDate = now.toLocaleString('ja-JP');
+    const postData = { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey };
 
-    const postData = { 
-      from: f.value, 
-      to: t.value, 
-      category: document.getElementById('category').value, 
-      values: checks, 
-      message: document.getElementById('message').value, 
-      timestamp: serverTimestamp(), 
-      dateKey: dateKey 
-    };
-
-    push(postsRef, postData)
-    .then(() => { 
-      // 修正：Googleチャット通知用の要約テキストを追加
+    push(postsRef, postData).then(() => { 
       const summaryText = `🚀CULTURE SEEDが更新されました✨\n🫘Sow Seeds🌱\n${postData.from}さんが${postData.to}さん宛に投稿しました！\n確認して盛り上げましょう🔥`;
-      
-      sendToSpreadsheet({ 
-        type: "post", 
-        displayDate: displayDate,
-        summary: summaryText, // これをGAS側で引用
-        ...postData,
-        values: checks.join(', ')
-      });
-      e.target.reset(); 
-      triggerThanksEffect(); 
+      sendToSpreadsheet({ type: "post", displayDate: displayDate, summary: summaryText, ...postData, values: checks.join(', ') });
+      e.target.reset(); triggerThanksEffect(); 
     });
   });
 
@@ -375,12 +355,16 @@
     s.style.background = starColors[Math.floor(Math.random()*starColors.length)];
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
+  
+  // 修正：流れ星の頻度を上げる（300ms -> 150ms）
   setInterval(() => {
     const s = document.createElement('div'); s.className = 'shooting-star';
-    s.style.left = Math.random()*110+'vw'; s.style.animationDuration = (Math.random()*1.2+0.8)+'s';
-    s.style.background = 'linear-gradient(to bottom, transparent, #fff)'; sf.appendChild(s);
-    setTimeout(() => s.remove(), 2500);
-  }, 300);
+    s.style.left = (Math.random()*120 - 20) + 'vw'; 
+    s.style.top = (Math.random()*50 - 10) + 'vh';
+    s.style.animationDuration = (Math.random()*1.5+0.5)+'s';
+    sf.appendChild(s);
+    setTimeout(() => s.remove(), 2000);
+  }, 150);
 </script>
 </body>
 </html>
