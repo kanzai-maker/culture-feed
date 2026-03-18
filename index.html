@@ -40,34 +40,29 @@
     .twinkle-star { position: absolute; border-radius: 50%; opacity: 0; animation: twinkle var(--d) ease-in-out infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
 
-    /* 修正：流れ星のデザイン、速度、色を変更 */
+    /* 修正：流れ星のデザインを絵文字のみに */
     .shooting-star {
       position: absolute;
       opacity: 0;
       animation: shoot-diag linear infinite;
-      display: flex; /* 線と星を横並びに */
-      align-items: center;
       color: #fff; /* デフォルトの色（JSで上書き） */
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .shooting-star::before { /* 線 */
-      content: '';
-      display: block;
-      width: 40px; /* 線の長さ */
-      height: 1px; /* 線の太さ */
-      background: currentColor; /* 星と同じ色に */
-      margin-right: -2px; /* 星と少し重ねる */
-    }
-    .shooting-star::after { /* 星 */
-      content: '⭐'; /* 星の絵文字 */
-      font-size: 14px; /* 星の大きさ */
+    
+    /* 修正：線を削除し、星の絵文字だけを表示 */
+    .shooting-star::after {
+      content: attr(data-emoji); /* JSで設定した絵文字を表示 */
+      font-size: attr(data-size); /* JSで設定したサイズを適用 */
     }
 
-    /* 修正：アニメーション（速度を遅く） */
+    /* 修正：アニメーション（超・低速化） */
     @keyframes shoot-diag {
       0% { transform: translate(120vw, -10vh) rotate(-45deg); opacity: 0; }
-      1% { opacity: 1; } /* 線の表示 */
-      5% { opacity: 1; }
-      25% { transform: translate(-20vw, 110vh) rotate(-45deg); opacity: 0; } /* 画面外へ */
+      2% { opacity: 1; }
+      15% { opacity: 1; }
+      80% { transform: translate(-20vw, 110vh) rotate(-45deg); opacity: 0; } /* 修正：ゆっくり移動 */
       100% { opacity: 0; } /* フェードアウト完了 */
     }
 
@@ -156,8 +151,7 @@
           </div>
           <div style="margin-top:15px;">
             <label>項目選択</label>
-            <select id="category">
-              <option value="🤝 Thanks">🤝 Thanks</option>
+            <select id="category"><br>              <option value="🤝 Thanks">🤝 Thanks</option>
               <option value="💰 商売を展開、商売を心から楽しむ">💰 商売を展開、商売を心から楽しむ</option>
               <option value="🔥 MVVを体現">🔥 MVVを体現</option>
               <option value="💎 主体性の発揮">💎 主体性の発揮</option>
@@ -195,7 +189,7 @@
         </div>
         <div class="float-item astro">
           <svg width="80" height="80" viewBox="0 0 24 24" fill="#fff">
-            <path d="M12 1a5 5 0 0 0-5 5v2h10V6a5 5 0 0 0-5-5zM7 9v6h2v-4h1v4h2v-4h1v4h2v-4h1v4h2v-4h1v4h2V9H7z" opacity="0.9"/>
+            <path d="M12 1a5 5 0 0 0-5 5v2h10V6a5 5 0 0 0-5-5zM7 9v6h2v-4h1v4h2v-4h1v4h2v-4h1v4h2V9H7z" opacity="0.9"/>
             <rect x="9" y="4" width="6" height="3" rx="1" fill="#333"/>
             <circle cx="12" cy="18" r="3" fill="#eee"/>
           </svg>
@@ -390,15 +384,22 @@
     s.style.left = (Math.random()*120 - 20) + 'vw'; 
     s.style.top = (Math.random()*50 - 10) + 'vh';
     
-    // 修正：速度を遅く（4s〜8sの間でランダム）
-    s.style.animationDuration = (Math.random()*4 + 4)+'s';
+    // 修正：速度を遅く（8s〜12sの間でランダム）
+    s.style.animationDuration = (Math.random()*4 + 8)+'s';
     
     // 修正：色を既存の星々の色からランダムに選択して適用
     s.style.color = starColors[Math.floor(Math.random()*starColors.length)];
     
+    // 修正：絵文字の種類をランダムに設定（⭐、🌟、✨）
+    const emojis = ["⭐", "🌟", "✨"];
+    s.setAttribute("data-emoji", emojis[Math.floor(Math.random()*emojis.length)]);
+    
+    // 修正：サイズをランダムに設定（10px〜20px）
+    s.setAttribute("data-size", (Math.random()*10 + 10) + "px");
+
     sf.appendChild(s);
-    setTimeout(() => s.remove(), 8000); // 修正：アニメーション終了後に削除
-  }, 300); // 修正：生成頻度を少し落とす（150ms -> 300ms）
+    setTimeout(() => s.remove(), 12000); // 修正：アニメーション終了後に削除
+  }, 300); // 修正：生成頻度を落とす（150ms -> 300ms）
 
 </script>
 </body>
