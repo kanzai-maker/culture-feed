@@ -18,7 +18,7 @@
       overflow-x: hidden; min-height: 100vh;
     }
 
-    /* 演出：銀河・天の川演出 */
+    /*背景演出：維持*/
     .galaxy-container {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: 
@@ -40,14 +40,38 @@
     .twinkle-star { position: absolute; border-radius: 50%; opacity: 0; animation: twinkle var(--d) ease-in-out infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
 
-    .shooting-star { position: absolute; width: 2px; height: 2px; background: #fff; opacity: 0; animation: shoot-diag linear infinite; }
-    @keyframes shoot-diag {
-      0% { transform: translate(120vw, -10vh) rotate(-45deg) scaleX(0); opacity: 0; }
-      10% { opacity: 1; scaleX(30); }
-      30% { transform: translate(-20vw, 110vh) rotate(-45deg) scaleX(30); opacity: 0; }
-      100% { opacity: 0; }
+    /* 修正：流れ星のデザイン、速度、色を変更 */
+    .shooting-star {
+      position: absolute;
+      opacity: 0;
+      animation: shoot-diag linear infinite;
+      display: flex; /* 線と星を横並びに */
+      align-items: center;
+      color: #fff; /* デフォルトの色（JSで上書き） */
+    }
+    .shooting-star::before { /* 線 */
+      content: '';
+      display: block;
+      width: 40px; /* 線の長さ */
+      height: 1px; /* 線の太さ */
+      background: currentColor; /* 星と同じ色に */
+      margin-right: -2px; /* 星と少し重ねる */
+    }
+    .shooting-star::after { /* 星 */
+      content: '⭐'; /* 星の絵文字 */
+      font-size: 14px; /* 星の大きさ */
     }
 
+    /* 修正：アニメーション（速度を遅く） */
+    @keyframes shoot-diag {
+      0% { transform: translate(120vw, -10vh) rotate(-45deg); opacity: 0; }
+      1% { opacity: 1; } /* 線の表示 */
+      5% { opacity: 1; }
+      25% { transform: translate(-20vw, 110vh) rotate(-45deg); opacity: 0; } /* 画面外へ */
+      100% { opacity: 0; } /* フェードアウト完了 */
+    }
+
+    /* Thanks演出 */
     .thanks-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 6rem; font-weight: 900; color: #fffde7; text-shadow: 0 0 50px #ffd700; z-index: 10000; pointer-events: none; animation: thanksFade 2.5s forwards; }
     @keyframes thanksFade { 0% { opacity: 0; scale: 0.5; } 20% { opacity: 1; scale: 1.2; } 100% { opacity: 0; transform: translate(-50%, -70%); scale: 1; } }
     .particle { position: fixed; pointer-events: none; z-index: 9999; animation: particle-move 2s ease-out forwards; }
@@ -63,10 +87,12 @@
 
     .panel { background: var(--glass); border: 1px solid rgba(255,255,255,0.15); border-radius: 32px; padding: 30px; margin-bottom: 30px; backdrop-filter: blur(25px); }
 
+    /* ソートボタン */
     .sort-area { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
     .sort-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-size: 13px; }
     .sort-btn.active { background: var(--orange); color: #000; font-weight: bold; }
 
+    /* Seed Box */
     #feedList { max-height: 800px; overflow-y: auto; padding-right: 15px; scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
     .post-card { background: rgba(255,255,255,0.08); border-radius: 25px; padding: 25px; margin-bottom: 25px; border-left: 8px solid var(--orange); }
     .post-header-info { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
@@ -79,6 +105,7 @@
     .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
     .value-item input { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--orange); }
 
+    /* 宇宙飛行士・宇宙人・ロケットの浮遊演出 */
     .space-group { position: relative; height: 180px; margin-top: 20px; }
     .float-item { position: absolute; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
     
@@ -168,7 +195,7 @@
         </div>
         <div class="float-item astro">
           <svg width="80" height="80" viewBox="0 0 24 24" fill="#fff">
-            <path d="M12 1a5 5 0 0 0-5 5v2h10V6a5 5 0 0 0-5-5zM7 9v6h2v-4h1v4h2v-4h1v4h2v-4h1v4h2V9H7z" opacity="0.9"/>
+            <path d="M12 1a5 5 0 0 0-5 5v2h10V6a5 5 0 0 0-5-5zM7 9v6h2v-4h1v4h2v-4h1v4h2v-4h1v4h2v-4h1v4h2V9H7z" opacity="0.9"/>
             <rect x="9" y="4" width="6" height="3" rx="1" fill="#333"/>
             <circle cx="12" cy="18" r="3" fill="#eee"/>
           </svg>
@@ -187,7 +214,6 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, push, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-  /* 修正：認証用ライブラリを追加 */
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   const firebaseConfig = {
@@ -203,15 +229,13 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
   
-  /* 修正：匿名ログインを実行 */
   const auth = getAuth(app);
   signInAnonymously(auth).catch((error) => {
-    console.error("Firebase Login Error:", error.message);
+    console.error("ログインに失敗しました:", error.message);
   });
 
   const postsRef = ref(db, 'posts');
 
-  /* 修正：ご提示いただいた最新のGAS URL */
   const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwJwp6RmsJ1XLB59rVrrmlIkVWTlnLPnpbCmvc0r3Z4Kp9vtw62vQD3FfjOS4kHS3V6uQ/exec";
 
   const members = ["第二全体", "未選択", "安齋 慶人", "金井 裕之介", "中村 景一郎", "前田 拓真", "庄司 祐亮", "太田 魁晟", "高本 優", "白鳥 拓人", "柳沢 緋里", "和田 翔太郎", "斉藤 直文", "中川 春花", "三登 有夏", "金兒 胤栄", "山﨑 紀史", "茨 陸翔", "古田 大貴", "吉増 海斗"];
@@ -315,7 +339,6 @@
   async function sendToSpreadsheet(data) {
     if(!GAS_WEBAPP_URL) return;
     try {
-      /* 修正：modeをcorsにしてエラーを検知しやすく調整 */
       await fetch(GAS_WEBAPP_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
     } catch (e) { console.error("Sync Error:", e); }
   }
@@ -329,7 +352,6 @@
     const postData = { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey };
 
     push(postsRef, postData).then(() => { 
-      /* 修正：Googleチャット通知用の要約テキストを作成 */
       const summaryText = `🚀CULTURE SEEDが更新されました✨\n🫘Sow Seeds🌱\n${postData.from}さんが${postData.to}さん宛に投稿しました！\n確認して盛り上げましょう🔥`;
       sendToSpreadsheet({ type: "post", displayDate: displayDate, summary: summaryText, ...postData, values: checks.join(', ') });
       e.target.reset(); triggerThanksEffect(); 
@@ -362,14 +384,22 @@
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
   
+  // 修正：流れ星の生成処理を変更（色、速度、デザイン）
   setInterval(() => {
     const s = document.createElement('div'); s.className = 'shooting-star';
     s.style.left = (Math.random()*120 - 20) + 'vw'; 
     s.style.top = (Math.random()*50 - 10) + 'vh';
-    s.style.animationDuration = (Math.random()*1.5+0.5)+'s';
+    
+    // 修正：速度を遅く（4s〜8sの間でランダム）
+    s.style.animationDuration = (Math.random()*4 + 4)+'s';
+    
+    // 修正：色を既存の星々の色からランダムに選択して適用
+    s.style.color = starColors[Math.floor(Math.random()*starColors.length)];
+    
     sf.appendChild(s);
-    setTimeout(() => s.remove(), 2000);
-  }, 150);
+    setTimeout(() => s.remove(), 8000); // 修正：アニメーション終了後に削除
+  }, 300); // 修正：生成頻度を少し落とす（150ms -> 300ms）
+
 </script>
 </body>
 </html>
