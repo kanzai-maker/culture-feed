@@ -18,7 +18,7 @@
       overflow-x: hidden; min-height: 100vh;
     }
 
-    /*背景演出：維持*/
+    /* 修正：背景演出の強化（銀河・星屑） */
     .galaxy-container {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: 
@@ -27,6 +27,15 @@
         radial-gradient(ellipse at 50% 40%, rgba(180, 60, 40, 0.2), transparent 70%),
         url('https://www.transparenttextures.com/patterns/stardust.png');
     }
+    /* 追加：星屑の揺らぎ演出 */
+    .nebula {
+      position: fixed; inset: 0;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.05) 0%, transparent 70%);
+      animation: nebulaPulse 10s ease-in-out infinite;
+      z-index: 0; pointer-events: none;
+    }
+    @keyframes nebulaPulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.5; } }
+
     .twinkle-star { position: absolute; border-radius: 50%; opacity: 0; animation: twinkle var(--d) ease-in-out infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
     .shooting-star { position: absolute; top: -150px; width: 2px; opacity: 0; animation: shoot linear infinite; }
@@ -70,11 +79,16 @@
     .values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 15px; margin: 10px 0; }
     .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
     .value-item input { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--orange); }
+
+    /* 追加：宇宙飛行士アニメーション */
+    .astronaut-container { text-align: center; margin-top: 20px; animation: float 6s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-20px) rotate(5deg); } }
   </style>
 </head>
 <body>
 
 <div class="galaxy-container"></div>
+<div class="nebula"></div>
 <div id="starField"></div>
 
 <div class="container">
@@ -90,8 +104,6 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
           <h2 style="margin:0;">Seed Box</h2>
           <select id="archiveSelect" style="width:auto; height:40px; border-radius:20px; border:1px solid var(--orange); background:#000; color:var(--orange); padding:0 10px;">
-            <option value="2026-03">2026年3月</option>
-            <option value="2026-02">2026年2月</option>
           </select>
         </div>
         <div class="sort-area">
@@ -137,11 +149,19 @@
       <section class="panel">
         <h3 style="margin-top:0; color:var(--orange);">今月の投稿ランキング</h3>
         <select id="rankArchiveSelect" style="width:100%; height:45px; border-radius:12px; margin-bottom:20px; background:#000; color:var(--orange); border:1px solid var(--orange); padding:0 15px; font-weight:bold;">
-          <option value="2026-03">2026年3月のランキング</option>
-          <option value="2026-02">2026年2月のランキング</option>
         </select>
         <div id="rankingList"></div>
       </section>
+
+      <div class="astronaut-container">
+        <svg width="150" height="150" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C10.34 2 9 3.34 9 5V6.17C7.23 6.64 6 8.24 6 10V14C6 14.55 6.45 15 7 15H17C17.55 15 18 14.55 18 14V10C18 8.24 16.77 6.64 15 6.17V5C15 3.34 13.66 2 12 2Z" fill="#E0E0E0"/>
+          <path d="M9 10H15V13H9V10Z" fill="#333"/>
+          <path d="M7 16V19C7 20.1 7.9 21 9 21H10V18H14V21H15C16.1 21 17 20.1 17 19V16H7Z" fill="#E0E0E0"/>
+          <circle cx="12" cy="5" r="1" fill="#FF8C1A"/>
+        </svg>
+        <div style="color:var(--orange); font-size:12px; margin-top:5px; font-weight:bold; opacity:0.8;">EXPLORING CULTURE...</div>
+      </div>
     </aside>
   </div>
 </div>
@@ -164,13 +184,47 @@
   const db = getDatabase(app);
   const postsRef = ref(db, 'posts');
 
-  /* 修正：個人用Googleアカウントで発行した最新のGAS URLを適用 */
   const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwJwp6RmsJ1XLB59rVrrmlIkVWTlnLPnpbCmvc0r3Z4Kp9vtw62vQD3FfjOS4kHS3V6uQ/exec";
 
   const members = ["第二全体", "未選択", "安齋 慶人", "金井 裕之介", "中村 景一郎", "前田 拓真", "庄司 祐亮", "太田 魁晟", "高本 優", "白鳥 拓人", "柳沢 緋里", "和田 翔太郎", "斉藤 直文", "中川 春花", "三登 有夏", "金兒 胤栄", "山﨑 紀史", "茨 陸翔", "古田 大貴", "吉増 海斗"];
   const coreValues = ["Speed 速度", "Change & Challenge 変化と挑戦", "Input & Output 学びと行動", "Priority 優先順位", "Continuous Outcome 継続的成果", "Responsibility 責任感", "Key Communication 本質的議論", "Team Work 共創", "Creativity 発想", "Long-term thinking 長期思考"];
   let rawData = {};
   let sortMode = 'new';
+
+  /* 追加：アーカイブ選択肢を自動生成する関数 */
+  function setupArchiveOptions() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    const currentDate = now.getDate();
+    
+    const targets = [document.getElementById('archiveSelect'), document.getElementById('rankArchiveSelect')];
+    
+    // 30日以降なら翌月も追加
+    let months = [];
+    if (currentDate >= 30) {
+      const nextDate = new Date(currentYear, currentMonth, 1);
+      months.push(`${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}`);
+    }
+    
+    // 今月
+    const thisMonthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+    months.push(thisMonthKey);
+    
+    // 先月
+    const lastDate = new Date(currentYear, currentMonth - 2, 1);
+    months.push(`${lastDate.getFullYear()}-${String(lastDate.getMonth() + 1).padStart(2, '0')}`);
+    
+    targets.forEach(select => {
+      select.innerHTML = months.map(m => {
+        const [y, mm] = m.split('-');
+        return `<option value="${m}">${y}年${parseInt(mm)}月${select.id === 'rankArchiveSelect' ? 'のランキング' : ''}</option>`;
+      }).join('');
+      // デフォルトは今月を選択
+      select.value = thisMonthKey;
+    });
+  }
+  setupArchiveOptions();
 
   const f = document.getElementById('fromName'), t = document.getElementById('toName'), vGrid = document.getElementById('valuesCheckboxes');
   members.forEach(m => { f.add(new Option(m, m)); t.add(new Option(m, m)); });
@@ -206,7 +260,7 @@
       <div class="post-card">
         <div class="post-header-info">${p.from} ➔ ${p.to}</div>
         <span class="post-category-label">${p.category}</span>
-        <div style="margin:10px 0; color:var(--orange); font-size:12px;">${p.values ? p.values.map(v=>'#'+v.split(' ')[0]).join(' ') : ''}</div>
+        <div style="margin:10px 0; color:var(--orange); font-size:12px;">${p.values ? p.values.map(v=>'#'+v).join(' ') : ''}</div>
         <div style="margin:15px 0; font-size:18px; line-height:1.7; white-space:pre-wrap;">${p.message}</div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           ${fixedReactions.map(fr => {
@@ -281,9 +335,13 @@
 
     push(postsRef, postData)
     .then(() => { 
+      // 修正：Googleチャット通知用の要約テキストを追加
+      const summaryText = `🚀CULTURE SEEDが更新されました✨\n🫘Sow Seeds🌱\n${postData.from}さんが${postData.to}さん宛に投稿しました！\n確認して盛り上げましょう🔥`;
+      
       sendToSpreadsheet({ 
         type: "post", 
         displayDate: displayDate,
+        summary: summaryText, // これをGAS側で引用
         ...postData,
         values: checks.join(', ')
       });
