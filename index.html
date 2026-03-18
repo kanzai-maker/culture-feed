@@ -40,7 +40,7 @@
     .twinkle-star { position: absolute; border-radius: 50%; opacity: 0; animation: twinkle var(--d) ease-in-out infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
 
-    /* 修正：流れ星のデザインを絵文字のみに */
+    /* 修正：流れ星のデザイン（絵文字のみ、トレイル廃止） */
     .shooting-star {
       position: absolute;
       opacity: 0;
@@ -51,18 +51,18 @@
       justify-content: center;
     }
     
-    /* 修正：線を削除し、星の絵文字だけを表示 */
+    /* 修正：星の絵文字を表示。コンテンツとサイズはJSで動的に設定 */
     .shooting-star::after {
       content: attr(data-emoji); /* JSで設定した絵文字を表示 */
       font-size: attr(data-size); /* JSで設定したサイズを適用 */
     }
 
-    /* 修正：アニメーション（超・低速化） */
+    /* アニメーション（超・低速化、維持） */
     @keyframes shoot-diag {
       0% { transform: translate(120vw, -10vh) rotate(-45deg); opacity: 0; }
       2% { opacity: 1; }
       15% { opacity: 1; }
-      80% { transform: translate(-20vw, 110vh) rotate(-45deg); opacity: 0; } /* 修正：ゆっくり移動 */
+      80% { transform: translate(-20vw, 110vh) rotate(-45deg); opacity: 0; } /* ゆっくり移動 */
       100% { opacity: 0; } /* フェードアウト完了 */
     }
 
@@ -100,17 +100,43 @@
     .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
     .value-item input { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--orange); }
 
-    /* 宇宙飛行士・宇宙人・ロケットの浮遊演出 */
-    .space-group { position: relative; height: 180px; margin-top: 20px; }
+    /* 修正：宇宙飛行士・宇宙人の浮遊演出（大小さまざま、ちりばめる） */
+    .space-group { position: relative; height: 300px; margin-top: 20px; }
     .float-item { position: absolute; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
     
-    .astro { left: 30%; animation: floatAstro 5s ease-in-out infinite; }
-    .alien { left: 10%; top: 60px; animation: floatAlien 4s ease-in-out infinite; transform: scale(0.7); }
-    .rocket { right: 15%; top: 20px; animation: floatRocket 7s ease-in-out infinite; transform: rotate(-20deg) scale(0.6); }
+    /* 宇宙飛行士（大小4名） */
+    .astro1 { left: 10%; top: 20px; animation: floatAstro 5s ease-in-out infinite; transform: scale(1.0); }
+    .astro2 { left: 40%; top: 80px; animation: floatAstro 6s ease-in-out infinite; transform: scale(0.6); opacity: 0.8; }
+    .astro3 { right: 20%; top: 30px; animation: floatAstro 7s ease-in-out infinite; transform: scale(0.8); }
+    .astro4 { left: 70%; top: 150px; animation: floatAstro 8s ease-in-out infinite; transform: scale(0.5); opacity: 0.7; }
+    
+    /* 宇宙人（大小4名、いろんな色、ちりばめる） */
+    .alien1 { left: 5%; top: 150px; animation: floatAlien 4s ease-in-out infinite; transform: scale(0.7); fill: #64ffda; } /* 緑 */
+    .alien2 { left: 25%; top: 220px; animation: floatAlien 5s ease-in-out infinite; transform: scale(0.5); fill: #ba68c8; } /* 紫 */
+    .alien3 { right: 10%; top: 180px; animation: floatAlien 6s ease-in-out infinite; transform: scale(0.9); fill: #fff176; } /* 黄 */
+    .alien4 { left: 80%; top: 60px; animation: floatAlien 7s ease-in-out infinite; transform: scale(0.4); fill: #ef5350; } /* 赤 */
 
-    @keyframes floatAstro { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-15px) rotate(5deg); } }
-    @keyframes floatAlien { 0%, 100% { transform: translate(0,0) rotate(0); } 50% { transform: translate(5px, 10px) rotate(-10deg); } }
-    @keyframes floatRocket { 0%, 100% { transform: translate(0,0) rotate(-20deg); } 50% { transform: translate(-10px, -5px) rotate(-15deg); } }
+    /* 修正：ロケット削除 */
+
+    @keyframes floatAstro { 0%, 100% { transform: translateY(0) rotate(0) scale(var(--s)); } 50% { transform: translateY(-15px) rotate(5deg) scale(var(--s)); } }
+    @keyframes floatAlien { 0%, 100% { transform: translate(0,0) rotate(0) scale(var(--s)); } 50% { transform: translate(5px, 10px) rotate(-10deg) scale(var(--s)); } }
+
+    /* 追加：浮遊するワード「文化醸成中...」 */
+    .floating-word {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      color: var(--orange);
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      animation: floatWord 6s ease-in-out infinite;
+      text-shadow: 0 0 10px rgba(255, 140, 26, 0.5);
+    }
+    @keyframes floatWord {
+      0%, 100% { transform: translateY(0); opacity: 0.8; }
+      50% { transform: translateY(-10px); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -151,7 +177,8 @@
           </div>
           <div style="margin-top:15px;">
             <label>項目選択</label>
-            <select id="category"><br>              <option value="🤝 Thanks">🤝 Thanks</option>
+            <select id="category">
+              <option value="🤝 Thanks">🤝 Thanks</option>
               <option value="💰 商売を展開、商売を心から楽しむ">💰 商売を展開、商売を心から楽しむ</option>
               <option value="🔥 MVVを体現">🔥 MVVを体現</option>
               <option value="💎 主体性の発揮">💎 主体性の発揮</option>
@@ -181,25 +208,61 @@
       </section>
 
       <div class="space-group">
-        <div class="float-item alien">
-          <svg width="60" height="60" viewBox="0 0 24 24" fill="#64ffda">
-            <path d="M12 2a7 7 0 0 0-7 7c0 3 2.5 5.5 5.5 5.9V19a1 1 0 1 0 2 0v-4.1c3-.4 5.5-3 5.5-5.9a7 7 0 0 0-7-7zm-3 7a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm6 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0z"/>
-            <path d="M6 20a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm12 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-6 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-          </svg>
-        </div>
-        <div class="float-item astro">
+        <div class="float-item astro1" style="--s:1.0;">
           <svg width="80" height="80" viewBox="0 0 24 24" fill="#fff">
             <path d="M12 1a5 5 0 0 0-5 5v2h10V6a5 5 0 0 0-5-5zM7 9v6h2v-4h1v4h2v-4h1v4h2v-4h1v4h2V9H7z" opacity="0.9"/>
             <rect x="9" y="4" width="6" height="3" rx="1" fill="#333"/>
             <circle cx="12" cy="18" r="3" fill="#eee"/>
           </svg>
         </div>
-        <div class="float-item rocket">
-          <svg width="50" height="50" viewBox="0 0 24 24" fill="#ff5252">
-            <path d="M12 2.5s-5 4-5 10.5c0 2 1 3.5 1 3.5h8s1-1.5 1-3.5c0-6.5-5-10.5-5-10.5zM9 19l-1 2h8l-1-2H9z"/>
+        <div class="float-item astro2" style="--s:0.6;">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="#fff">
+            <path d="M12 1a5 5 0 0 0-5 5v2h10V6a5 5 0 0 0-5-5zM7 9v6h2v-4h1v4h2v-4h1v4h2v-4h1v4h2V9H7z" opacity="0.9"/>
+            <rect x="9" y="4" width="6" height="3" rx="1" fill="#333"/>
+            <circle cx="12" cy="18" r="3" fill="#eee"/>
           </svg>
         </div>
-        <div style="position:absolute; bottom:0; width:100%; text-align:center; color:var(--orange); font-size:14px; font-weight:bold; letter-spacing:2px;">文化醸成中...</div>
+        <div class="float-item astro3" style="--s:0.8;">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="#fff">
+            <path d="M12 1a5 5 0 0 0-5 5v2h10V6a5 5 0 0 0-5-5zM7 9v6h2v-4h1v4h2v-4h1v4h2v-4h1v4h2V9H7z" opacity="0.9"/>
+            <rect x="9" y="4" width="6" height="3" rx="1" fill="#333"/>
+            <circle cx="12" cy="18" r="3" fill="#eee"/>
+          </svg>
+        </div>
+        <div class="float-item astro4" style="--s:0.5;">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="#fff">
+            <path d="M12 1a5 5 0 0 0-5 5v2h10V6a5 5 0 0 0-5-5zM7 9v6h2v-4h1v4h2v-4h1v4h2v-4h1v4h2V9H7z" opacity="0.9"/>
+            <rect x="9" y="4" width="6" height="3" rx="1" fill="#333"/>
+            <circle cx="12" cy="18" r="3" fill="#eee"/>
+          </svg>
+        </div>
+
+        <div class="float-item alien1" style="--s:0.7;">
+          <svg width="60" height="60" viewBox="0 0 24 24">
+            <path d="M12 2a7 7 0 0 0-7 7c0 3 2.5 5.5 5.5 5.9V19a1 1 0 1 0 2 0v-4.1c3-.4 5.5-3 5.5-5.9a7 7 0 0 0-7-7zm-3 7a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm6 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0z"/>
+            <path d="M6 20a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm12 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-6 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+          </svg>
+        </div>
+        <div class="float-item alien2" style="--s:0.5;">
+          <svg width="60" height="60" viewBox="0 0 24 24">
+            <path d="M12 2a7 7 0 0 0-7 7c0 3 2.5 5.5 5.5 5.9V19a1 1 0 1 0 2 0v-4.1c3-.4 5.5-3 5.5-5.9a7 7 0 0 0-7-7zm-3 7a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm6 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0z"/>
+            <path d="M6 20a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm12 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-6 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+          </svg>
+        </div>
+        <div class="float-item alien3" style="--s:0.9;">
+          <svg width="60" height="60" viewBox="0 0 24 24">
+            <path d="M12 2a7 7 0 0 0-7 7c0 3 2.5 5.5 5.5 5.9V19a1 1 0 1 0 2 0v-4.1c3-.4 5.5-3 5.5-5.9a7 7 0 0 0-7-7zm-3 7a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm6 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0z"/>
+            <path d="M6 20a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm12 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-6 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+          </svg>
+        </div>
+        <div class="float-item alien4" style="--s:0.4;">
+          <svg width="60" height="60" viewBox="0 0 24 24">
+            <path d="M12 2a7 7 0 0 0-7 7c0 3 2.5 5.5 5.5 5.9V19a1 1 0 1 0 2 0v-4.1c3-.4 5.5-3 5.5-5.9a7 7 0 0 0-7-7zm-3 7a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm6 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0z"/>
+            <path d="M6 20a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm12 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-6 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+          </svg>
+        </div>
+
+        <div class="floating-word" style="bottom:20px;">文化醸成中...</div>
       </div>
     </aside>
   </div>
@@ -378,28 +441,28 @@
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
   
-  // 修正：流れ星の生成処理を変更（色、速度、デザイン）
+  // 修正：流れ星の生成処理を変更（色、速度、デザイン、サイズ、絵文字の多様化、トレイル廃止）
   setInterval(() => {
     const s = document.createElement('div'); s.className = 'shooting-star';
     s.style.left = (Math.random()*120 - 20) + 'vw'; 
     s.style.top = (Math.random()*50 - 10) + 'vh';
     
-    // 修正：速度を遅く（8s〜12sの間でランダム）
+    // 速度を遅く（8s〜12sの間でランダム、維持）
     s.style.animationDuration = (Math.random()*4 + 8)+'s';
     
-    // 修正：色を既存の星々の色からランダムに選択して適用
+    // 色を既存の星々の色からランダムに選択して適用（維持）
     s.style.color = starColors[Math.floor(Math.random()*starColors.length)];
     
-    // 修正：絵文字の種類をランダムに設定（⭐、🌟、✨）
-    const emojis = ["⭐", "🌟", "✨"];
+    // 修正：絵文字の種類をさらに追加（⭐、🌟、✨、💫、🌠、✨、🎇）
+    const emojis = ["⭐", "🌟", "✨", "💫", "🌠", "✨", "🎇"];
     s.setAttribute("data-emoji", emojis[Math.floor(Math.random()*emojis.length)]);
     
-    // 修正：サイズをランダムに設定（10px〜20px）
-    s.setAttribute("data-size", (Math.random()*10 + 10) + "px");
+    // 修正：サイズを大小さまざまに（10px〜50pxの間でランダム）
+    s.setAttribute("data-size", (Math.random()*40 + 10) + "px");
 
     sf.appendChild(s);
-    setTimeout(() => s.remove(), 12000); // 修正：アニメーション終了後に削除
-  }, 300); // 修正：生成頻度を落とす（150ms -> 300ms）
+    setTimeout(() => s.remove(), 12000); // アニメーション終了後に削除
+  }, 600); // 修正：生成頻度を落とす（300ms -> 600ms）することで、一つ一つがよりゆっくりに見えるように調整
 
 </script>
 </body>
