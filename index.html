@@ -164,8 +164,8 @@
   const db = getDatabase(app);
   const postsRef = ref(db, 'posts');
 
-  /* 追加：提供されたGASウェブアプリURLを設定 */
-  const GAS_WEBAPP_URL = "https://script.google.com/a/macros/marketenterprise.co.jp/s/AKfycbxbD8oEoRBUd69nclTVtRcVRMeRG_HpbaqSIkvs06uVo7GG56GIE5rU_RWSXd__0A1G/exec";
+  /* 修正：個人用Googleアカウントで発行した最新のGAS URLを適用 */
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwJwp6RmsJ1XLB59rVrrmlIkVWTlnLPnpbCmvc0r3Z4Kp9vtw62vQD3FfjOS4kHS3V6uQ/exec";
 
   const members = ["第二全体", "未選択", "安齋 慶人", "金井 裕之介", "中村 景一郎", "前田 拓真", "庄司 祐亮", "太田 魁晟", "高本 優", "白鳥 拓人", "柳沢 緋里", "和田 翔太郎", "斉藤 直文", "中川 春花", "三登 有夏", "金兒 胤栄", "山﨑 紀史", "茨 陸翔", "古田 大貴", "吉増 海斗"];
   const coreValues = ["Speed 速度", "Change & Challenge 変化と挑戦", "Input & Output 学びと行動", "Priority 優先順位", "Continuous Outcome 継続的成果", "Responsibility 責任感", "Key Communication 本質的議論", "Team Work 共創", "Creativity 発想", "Long-term thinking 長期思考"];
@@ -174,7 +174,6 @@
 
   const f = document.getElementById('fromName'), t = document.getElementById('toName'), vGrid = document.getElementById('valuesCheckboxes');
   members.forEach(m => { f.add(new Option(m, m)); t.add(new Option(m, m)); });
-  /* 10 Core Valuesの生成：維持 */
   coreValues.forEach(v => { vGrid.innerHTML += `<label class="value-item"><input type="checkbox" name="cv" value="${v}">${v}</label>`; });
 
   onValue(postsRef, (s) => { rawData = s.val() || {}; refreshUI(); });
@@ -195,7 +194,6 @@
   }
 
   function renderFeed(posts) {
-    /* 修正済み：リアクションボタンの固定表示 */
     const fixedReactions = [
       {emoji: "🤝", label: "Thanks"},
       {emoji: "💰", label: "商売"},
@@ -236,11 +234,9 @@
   }
 
   function renderRanking(posts) {
-    /* 修正：投稿した人（From）の数が多い順のランキングにロジック変更 */
     const scores = {};
     posts.forEach(p => { 
       const sender = p.from;
-      // 「未選択」や「第二全体」は除外
       if(sender !== "未選択" && sender !== "第二全体") {
         scores[sender] = (scores[sender] || 0) + 1; 
       }
@@ -254,7 +250,6 @@
   window.promptEmoji = (id) => { const e = prompt("絵文字を入力:"); if(e) window.addReaction(id, e, 0); };
   window.addReply = (id) => { const t = document.getElementById(`re-${id}`).value; if(t) { push(ref(db, `posts/${id}/replies`), { text: t, timestamp: serverTimestamp() }); document.getElementById(`re-${id}`).value = ""; } };
 
-  /* 追加：スプレッドシートへのデータ送信関数 */
   async function sendToSpreadsheet(data) {
     if(!GAS_WEBAPP_URL) return;
     try {
@@ -269,7 +264,6 @@
 
   document.getElementById('cultureForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    /* 10 Core Valuesの選択内容を取得：維持 */
     const checks = Array.from(document.querySelectorAll('input[name="cv"]:checked')).map(c => c.value);
     const now = new Date();
     const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -287,12 +281,11 @@
 
     push(postsRef, postData)
     .then(() => { 
-      /* 追加：Firebase保存後にスプレッドシートへも送信 */
       sendToSpreadsheet({ 
         type: "post", 
         displayDate: displayDate,
         ...postData,
-        values: checks.join(', ') // スプレッドシート用にカンマ区切りに変換
+        values: checks.join(', ')
       });
       e.target.reset(); 
       triggerThanksEffect(); 
@@ -315,7 +308,6 @@
   document.getElementById('archiveSelect').addEventListener('change', refreshUI);
   document.getElementById('rankArchiveSelect').addEventListener('change', refreshUI);
 
-  //演出維持
   const sf = document.getElementById('starField');
   const starColors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0"];
   for(let i=0; i<250; i++) {
