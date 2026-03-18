@@ -18,7 +18,7 @@
       overflow-x: hidden; min-height: 100vh;
     }
 
-    /* 修正：銀河・天の川演出の強化 */
+    /* 演出：銀河・天の川演出 */
     .galaxy-container {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: 
@@ -28,7 +28,6 @@
         url('https://www.transparenttextures.com/patterns/stardust.png');
     }
     
-    /* 追加：回転する星屑レイヤー */
     .stardust-layer {
       position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
       background-image: radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)), radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0));
@@ -41,7 +40,6 @@
     .twinkle-star { position: absolute; border-radius: 50%; opacity: 0; animation: twinkle var(--d) ease-in-out infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
 
-    /* 修正：流れ星を右上から左下へ（頻度向上） */
     .shooting-star { position: absolute; width: 2px; height: 2px; background: #fff; opacity: 0; animation: shoot-diag linear infinite; }
     @keyframes shoot-diag {
       0% { transform: translate(120vw, -10vh) rotate(-45deg) scaleX(0); opacity: 0; }
@@ -50,7 +48,6 @@
       100% { opacity: 0; }
     }
 
-    /* Thanks演出 */
     .thanks-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 6rem; font-weight: 900; color: #fffde7; text-shadow: 0 0 50px #ffd700; z-index: 10000; pointer-events: none; animation: thanksFade 2.5s forwards; }
     @keyframes thanksFade { 0% { opacity: 0; scale: 0.5; } 20% { opacity: 1; scale: 1.2; } 100% { opacity: 0; transform: translate(-50%, -70%); scale: 1; } }
     .particle { position: fixed; pointer-events: none; z-index: 9999; animation: particle-move 2s ease-out forwards; }
@@ -66,12 +63,10 @@
 
     .panel { background: var(--glass); border: 1px solid rgba(255,255,255,0.15); border-radius: 32px; padding: 30px; margin-bottom: 30px; backdrop-filter: blur(25px); }
 
-    /* ソートボタン */
     .sort-area { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
     .sort-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-size: 13px; }
     .sort-btn.active { background: var(--orange); color: #000; font-weight: bold; }
 
-    /* Seed Box */
     #feedList { max-height: 800px; overflow-y: auto; padding-right: 15px; scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
     .post-card { background: rgba(255,255,255,0.08); border-radius: 25px; padding: 25px; margin-bottom: 25px; border-left: 8px solid var(--orange); }
     .post-header-info { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
@@ -84,7 +79,6 @@
     .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
     .value-item input { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--orange); }
 
-    /* 修正：宇宙飛行士・宇宙人・ロケットの浮遊演出 */
     .space-group { position: relative; height: 180px; margin-top: 20px; }
     .float-item { position: absolute; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
     
@@ -193,6 +187,8 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, push, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  /* 修正：認証用ライブラリを追加 */
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC_2bIvYpfgKrgyfQ9YKE1CykpnxLfQi0k",
@@ -206,8 +202,16 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
+  
+  /* 修正：匿名ログインを実行 */
+  const auth = getAuth(app);
+  signInAnonymously(auth).catch((error) => {
+    console.error("Firebase Login Error:", error.message);
+  });
+
   const postsRef = ref(db, 'posts');
 
+  /* 修正：ご提示いただいた最新のGAS URL */
   const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwJwp6RmsJ1XLB59rVrrmlIkVWTlnLPnpbCmvc0r3Z4Kp9vtw62vQD3FfjOS4kHS3V6uQ/exec";
 
   const members = ["第二全体", "未選択", "安齋 慶人", "金井 裕之介", "中村 景一郎", "前田 拓真", "庄司 祐亮", "太田 魁晟", "高本 優", "白鳥 拓人", "柳沢 緋里", "和田 翔太郎", "斉藤 直文", "中川 春花", "三登 有夏", "金兒 胤栄", "山﨑 紀史", "茨 陸翔", "古田 大貴", "吉増 海斗"];
@@ -311,6 +315,7 @@
   async function sendToSpreadsheet(data) {
     if(!GAS_WEBAPP_URL) return;
     try {
+      /* 修正：modeをcorsにしてエラーを検知しやすく調整 */
       await fetch(GAS_WEBAPP_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
     } catch (e) { console.error("Sync Error:", e); }
   }
@@ -324,6 +329,7 @@
     const postData = { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey };
 
     push(postsRef, postData).then(() => { 
+      /* 修正：Googleチャット通知用の要約テキストを作成 */
       const summaryText = `🚀CULTURE SEEDが更新されました✨\n🫘Sow Seeds🌱\n${postData.from}さんが${postData.to}さん宛に投稿しました！\n確認して盛り上げましょう🔥`;
       sendToSpreadsheet({ type: "post", displayDate: displayDate, summary: summaryText, ...postData, values: checks.join(', ') });
       e.target.reset(); triggerThanksEffect(); 
@@ -356,7 +362,6 @@
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
   
-  // 修正：流れ星の頻度を上げる（300ms -> 150ms）
   setInterval(() => {
     const s = document.createElement('div'); s.className = 'shooting-star';
     s.style.left = (Math.random()*120 - 20) + 'vw'; 
