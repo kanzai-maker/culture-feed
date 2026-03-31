@@ -249,7 +249,7 @@
           <button onclick="window.promptEmoji('${p.id}')" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer;">＋</button>
         </div>
         <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
-          ${p.replies ? Object.entries(p.replies).map(([rid, r]) => `<div style="background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; margin-bottom:5px; font-size:14px; display:flex; justify-content:space-between; align-items:center;"><span>${r.text}</span><button class="edit-trigger" onclick="window.editReply('${p.id}','${rid}')" style="margin:0;">編集</button></div>`).join('') : ''}
+          ${p.replies ? Object.entries(p.replies).map(([rid, r]) => `<div style="background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; margin-bottom:5px; font-size:14px; display:flex; justify-content:space-between; align-items:center;"><span>${r.text}</span><button class="edit-trigger" onclick="window.editReply('${p.id}','rid')">編集</button></div>`).join('') : ''}
           <div style="display:flex; gap:10px; margin-top:10px; align-items: center;"><input type="text" id="re-${p.id}" placeholder="返信..." style="flex:1; height:45px; font-size:14px; margin:0;"><button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:12px; height:45px; padding:0 25px; color:black; font-weight:bold; cursor:pointer; white-space:nowrap; min-width:80px;">送信</button></div>
         </div>
       </div>`).join('') || "種がありません";
@@ -264,7 +264,6 @@
     document.getElementById('trendStats').innerHTML = `<div style="font-size:24px; color:var(--orange); font-weight:bold;">Total: ${posts.length}</div>` + Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
   }
 
-  /* 修正：ランキング表記から「strong>」を削除し整形 */
   function renderRanking(posts) {
     const scores = {};
     posts.forEach(p => { const s = p.from; if(s !== "未選択" && s !== "第二全体") scores[s] = (scores[s] || 0) + 1; });
@@ -277,7 +276,7 @@
       if (rankToDisplay > 5) break;
       const isTie = (i + 1 < sorted.length && sorted[i+1][1] === score) || (score === lastScore);
       let rankLabel = "";
-      if (rankToDisplay === 1) rankLabel = "🥇1位👑：";
+      if (rankToDisplay === 1) rankLabel = "🥇1位：";
       else if (rankToDisplay === 2) rankLabel = "🥈2位";
       else if (rankToDisplay === 3) rankLabel = "🥉3位";
       else rankLabel = `${rankToDisplay}位`;
@@ -333,10 +332,15 @@
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
   setInterval(() => {
-    const s = document.createElement('div'); s.className = 'shooting-star';
-    s.innerText = ["⭐", "🌟", "✨", "☄", "🪐"][Math.floor(Math.random()*5)];
-    s.style.left = (Math.random()*80+20)+'vw'; s.style.color = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0", "#b39ddb"][Math.floor(Math.random()*8)];
-    s.style.fontSize = (Math.random()*20+10)+'px'; s.style.setProperty('--d', (Math.random()*2+3)+'s');
+    const starItems = ["⭐", "🌟", "✨", "☄", "🪐"];
+    const colors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0", "#b39ddb", "#ffcc80"];
+    const s = document.createElement('div'); 
+    s.className = 'shooting-star';
+    s.innerText = starItems[Math.floor(Math.random() * starItems.length)];
+    s.style.left = (Math.random() * 80 + 20) + 'vw';
+    s.style.color = colors[Math.floor(Math.random() * colors.length)];
+    s.style.fontSize = (Math.random() * 20 + 10) + 'px';
+    s.style.setProperty('--d', (Math.random() * 2 + 3) + 's');
     sf.appendChild(s); setTimeout(() => s.remove(), 5500);
   }, 250);
 </script>
