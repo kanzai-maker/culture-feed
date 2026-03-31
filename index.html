@@ -144,9 +144,6 @@
           <option value="2026-02">2026年2月のランキング</option>
         </select>
         <div id="rankingList"></div>
-        <div class="values-grid" style="grid-template-columns:repeat(5, 1fr); gap:10px; margin-top:20px; font-size:16px; padding:10px; border-radius:12px; background:rgba(0,0,0,0.3); justify-items:center;">
-          <span>👍</span><span>❤️</span><span>✨</span><span>😂</span><span>🤝</span>
-        </div>
       </section>
     </aside>
   </div>
@@ -256,6 +253,7 @@
       Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
   }
 
+  /* 修正：ランキングの表記方法を変更（👑追加・区切り文字変更） */
   function renderRanking(posts) {
     const scores = {};
     posts.forEach(p => { 
@@ -283,10 +281,21 @@
       if (rankToDisplay > 5) break;
 
       const isTie = (i + 1 < sortedEntries.length && sortedEntries[i+1][1] === score) || (score === lastScore);
-      const rankLabel = isTie ? `${rankToDisplay}位タイ` : `${rankToDisplay}.`;
+      let rankLabel = "";
+      
+      // 👑王冠の絵文字を追加
+      if (rankToDisplay === 1) rankLabel = "🥇1位";
+      else if (rankToDisplay === 2) rankLabel = "🥈2位";
+      else if (rankToDisplay === 3) rankLabel = "🥉3位";
+      else rankLabel = `${rankToDisplay}位`;
 
+      if (isTie) {
+        rankLabel += "タイ";
+      }
+      
+      // 区切り文字を「：」に変更
       html += `<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;">
-                <span>${rankLabel} ${name}</span>
+                <span>${rankLabel}： ${name}</span>
                 <strong>${score} seeds</strong>
               </div>`;
       
@@ -368,11 +377,30 @@
     s.style.background = starColors[Math.floor(Math.random()*starColors.length)];
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
+  
+  /* 演出維持：フワフワ浮く宇宙人などを元の流れ星の演出に混ざるように復活させました */
   setInterval(() => {
-    const s = document.createElement('div'); s.className = 'shooting-star';
-    s.style.left = Math.random()*110+'vw'; s.style.animationDuration = (Math.random()*1.2+0.8)+'s';
-    s.style.background = 'linear-gradient(to bottom, transparent, #fff)'; sf.appendChild(s);
-    setTimeout(() => s.remove(), 2500);
+    const isAlien = Math.random() < 0.2; // 20%の確率で宇宙人などを出す
+    if(isAlien) {
+      const alienItems = ["👾", "🛸", "🧑‍🚀", "🛸"];
+      const a = document.createElement('div');
+      a.className = 'particle'; // フワフワ動くアニメーションを適用
+      a.innerText = alienItems[Math.floor(Math.random() * alienItems.length)];
+      a.style.left = Math.random() * 100 + 'vw';
+      a.style.top = Math.random() * 100 + 'vh';
+      a.style.fontSize = (Math.random() * 20 + 15) + 'px';
+      a.style.setProperty('--tx', (Math.random() - 0.5) * 500 + 'px');
+      a.style.setProperty('--ty', (Math.random() - 0.5) * 500 + 'px');
+      a.style.setProperty('--tr', Math.random() * 360 + 'deg');
+      sf.appendChild(a);
+      setTimeout(() => a.remove(), 2000); // 演出維持のために短い間隔で消す
+    } else {
+      // 残りの80%は通常の流れ星
+      const s = document.createElement('div'); s.className = 'shooting-star';
+      s.style.left = Math.random()*110+'vw'; s.style.animationDuration = (Math.random()*1.2+0.8)+'s';
+      s.style.background = 'linear-gradient(to bottom, transparent, #fff)'; sf.appendChild(s);
+      setTimeout(() => s.remove(), 2500);
+    }
   }, 300);
 </script>
 </body>
