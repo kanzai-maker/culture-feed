@@ -29,13 +29,30 @@
     }
     .twinkle-star { position: absolute; border-radius: 50%; opacity: 0; animation: twinkle var(--d) ease-in-out infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
-    .shooting-star { position: absolute; top: -150px; width: 2px; opacity: 0; animation: shoot linear infinite; }
-    @keyframes shoot {
-      0% { transform: translate(100vw, 0) rotate(35deg); opacity: 0; }
-      15% { opacity: 1; }
-      45% { transform: translate(-20vw, 120vh) rotate(35deg); opacity: 0; }
-      100% { opacity: 0; }
+
+    /* 修正：右上から左下へ流れる流れ星のアニメーション */
+    .shooting-star { 
+      position: absolute; top: -50px; width: 1px; height: 1px; border-radius: 50%; opacity: 0;
+      animation: shoot var(--d) linear infinite;
     }
+    @keyframes shoot {
+      0% { transform: translate(100vw, 0) rotate(135deg); opacity: 1; }
+      100% { transform: translate(-50px, calc(100vh + 50px)) rotate(135deg); opacity: 0.2; }
+    }
+
+    /* 修正：右下の常時表示デコレーション用スタイル */
+    #rightBottomDeco {
+      position: fixed; bottom: 20px; right: 20px; width: 250px; height: 180px;
+      pointer-events: none; z-index: 5;
+    }
+    .floating-item { position: absolute; }
+    
+    @keyframes floatUfo { 0%, 100% { transform: translate(0, 0) rotate(-5deg); } 50% { transform: translate(10px, -15px) rotate(5deg); } }
+    @keyframes floatAstronaut1 { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-15px, 20px) rotate(10deg); } }
+    @keyframes floatAstronaut2 { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(20px, -10px) rotate(-15deg); } }
+    @keyframes floatAlien1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-10px, 15px); } }
+    @keyframes floatAlien2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(15px, 20px); } }
+    @keyframes floatAlien3 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, -15px); } }
 
     /* Thanks演出 */
     .thanks-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 6rem; font-weight: 900; color: #fffde7; text-shadow: 0 0 50px #ffd700; z-index: 10000; pointer-events: none; animation: thanksFade 2.5s forwards; }
@@ -79,6 +96,14 @@
 
 <div class="galaxy-container"></div>
 <div id="starField"></div>
+<div id="rightBottomDeco">
+  <div class="floating-item" style="font-size: 60px; left: 0px; top: 0px; animation: floatUfo 6s ease-in-out infinite;">🛸</div>
+  <div class="floating-item" style="font-size: 45px; left: 80px; top: 70px; animation: floatAstronaut1 7s ease-in-out infinite;">🧑‍🚀</div>
+  <div class="floating-item" style="font-size: 35px; left: 160px; top: 20px; animation: floatAstronaut2 8s ease-in-out infinite;">🧑‍🚀</div>
+  <div class="floating-item" style="font-size: 30px; left: 30px; top: 110px; color: #64ffda; animation: floatAlien1 9s ease-in-out infinite;">👾</div>
+  <div class="floating-item" style="font-size: 40px; left: 120px; top: 120px; color: #ff5252; animation: floatAlien2 10s ease-in-out infinite;">👾</div>
+  <div class="floating-item" style="font-size: 25px; left: 200px; top: 100px; color: #b39ddb; animation: floatAlien3 11s ease-in-out infinite;">👾</div>
+</div>
 
 <div class="container">
   <header>
@@ -93,8 +118,6 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
           <h2 style="margin:0;">Seed Box</h2>
           <select id="archiveSelect" style="width:auto; height:40px; border-radius:20px; border:1px solid var(--orange); background:#000; color:var(--orange); padding:0 10px;">
-            <option value="2026-03">2026年3月</option>
-            <option value="2026-02">2026年2月</option>
           </select>
         </div>
         <div class="sort-area">
@@ -140,8 +163,6 @@
       <section class="panel">
         <h3 style="margin-top:0; color:var(--orange);">今月の投稿してくれた人ランキング</h3>
         <select id="rankArchiveSelect" style="width:100%; height:45px; border-radius:12px; margin-bottom:20px; background:#000; color:var(--orange); border:1px solid var(--orange); padding:0 15px; font-weight:bold;">
-          <option value="2026-03">2026年3月のランキング</option>
-          <option value="2026-02">2026年2月のランキング</option>
         </select>
         <div id="rankingList"></div>
       </section>
@@ -173,6 +194,29 @@
   const coreValues = ["Speed 速度", "Change & Challenge 変化と挑戦", "Input & Output 学びと行動", "Priority 優先順位", "Continuous Outcome 継続的成果", "Responsibility 責任感", "Key Communication 本質的議論", "Team Work 共創", "Creativity 発想", "Long-term thinking 長期思考"];
   let rawData = {};
   let sortMode = 'new';
+
+  /* 修正：現在の月から過去3ヶ月分のアーカイブタグを自動生成する関数 */
+  function generateMonthArchiveOptions() {
+    const now = new Date();
+    const selects = [document.getElementById('archiveSelect'), document.getElementById('rankArchiveSelect')];
+    
+    selects.forEach(select => {
+      select.innerHTML = "";
+      for (let i = 0; i < 3; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const value = `${year}-${month}`;
+        const label = `${year}年${parseInt(month)}月` + (i===0 ? "（今月）" : (i===1 ? "（先月）" : ""));
+        
+        const option = new Option(label, value);
+        select.add(option);
+      }
+      select.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    });
+  }
+  // 初期実行
+  generateMonthArchiveOptions();
 
   const f = document.getElementById('fromName'), t = document.getElementById('toName'), vGrid = document.getElementById('valuesCheckboxes');
   members.forEach(m => { f.add(new Option(m, m)); t.add(new Option(m, m)); });
@@ -253,7 +297,7 @@
       Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
   }
 
-  /* 修正：ランキングの表記方法を変更（👑追加・区切り文字変更） */
+  /* 修正：ランキングの表記方法を変更（1位👑：・タイ対応・正確な表記） */
   function renderRanking(posts) {
     const scores = {};
     posts.forEach(p => { 
@@ -283,19 +327,19 @@
       const isTie = (i + 1 < sortedEntries.length && sortedEntries[i+1][1] === score) || (score === lastScore);
       let rankLabel = "";
       
-      // 👑王冠の絵文字を追加
-      if (rankToDisplay === 1) rankLabel = "🥇1位";
-      else if (rankToDisplay === 2) rankLabel = "🥈2位";
-      else if (rankToDisplay === 3) rankLabel = "🥉3位";
-      else rankLabel = `${rankToDisplay}位`;
+      // 👑王冠の絵文字と区切り文字「：」を適用
+      if (rankToDisplay === 1) rankLabel = "🥇1位👑：";
+      else if (rankToDisplay === 2) rankLabel = "🥈2位：";
+      else if (rankToDisplay === 3) rankLabel = "🥉3位：";
+      else rankLabel = `${rankToDisplay}位：`;
 
       if (isTie) {
-        rankLabel += "タイ";
+        // タイの場合は「：」を削除して「タイ」を付ける
+        rankLabel = rankLabel.replace("：", "") + "タイ ";
       }
       
-      // 区切り文字を「：」に変更
       html += `<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;">
-                <span>${rankLabel}： ${name}</span>
+                <span>${rankLabel}${name}</span>
                 <strong>${score} seeds</strong>
               </div>`;
       
@@ -378,30 +422,22 @@
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
   
-  /* 演出維持：フワフワ浮く宇宙人などを元の流れ星の演出に混ざるように復活させました */
+  /* 修正：右上から左下へ流れる大小さまざまな絵文字流れ星（ゆっくり） */
   setInterval(() => {
-    const isAlien = Math.random() < 0.2; // 20%の確率で宇宙人などを出す
-    if(isAlien) {
-      const alienItems = ["👾", "🛸", "🧑‍🚀", "🛸"];
-      const a = document.createElement('div');
-      a.className = 'particle'; // フワフワ動くアニメーションを適用
-      a.innerText = alienItems[Math.floor(Math.random() * alienItems.length)];
-      a.style.left = Math.random() * 100 + 'vw';
-      a.style.top = Math.random() * 100 + 'vh';
-      a.style.fontSize = (Math.random() * 20 + 15) + 'px';
-      a.style.setProperty('--tx', (Math.random() - 0.5) * 500 + 'px');
-      a.style.setProperty('--ty', (Math.random() - 0.5) * 500 + 'px');
-      a.style.setProperty('--tr', Math.random() * 360 + 'deg');
-      sf.appendChild(a);
-      setTimeout(() => a.remove(), 2000); // 演出維持のために短い間隔で消す
-    } else {
-      // 残りの80%は通常の流れ星
-      const s = document.createElement('div'); s.className = 'shooting-star';
-      s.style.left = Math.random()*110+'vw'; s.style.animationDuration = (Math.random()*1.2+0.8)+'s';
-      s.style.background = 'linear-gradient(to bottom, transparent, #fff)'; sf.appendChild(s);
-      setTimeout(() => s.remove(), 2500);
-    }
-  }, 300);
+    const starItems = ["⭐", "🌟", "✨", "☄", "🪐"];
+    const colors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0", "#b39ddb", "#ffcc80"];
+
+    const s = document.createElement('div'); 
+    s.className = 'shooting-star';
+    s.innerText = starItems[Math.floor(Math.random() * starItems.length)];
+    s.style.left = (Math.random() * 80 + 20) + 'vw'; // 右側から生成
+    s.style.color = colors[Math.floor(Math.random() * colors.length)];
+    s.style.fontSize = (Math.random() * 20 + 10) + 'px';
+    s.style.setProperty('--d', (Math.random() * 2 + 3) + 's'); // 3-5秒
+
+    sf.appendChild(s);
+    setTimeout(() => s.remove(), 5500); // アニメーション終了後に削除
+  }, 250); // 生成頻度
 </script>
 </body>
 </html>
