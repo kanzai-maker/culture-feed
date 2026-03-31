@@ -71,7 +71,6 @@
     .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
     .value-item input { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--orange); }
 
-    /* 修正：編集ボタン用スタイル */
     .edit-trigger { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #aaa; font-size: 11px; padding: 4px 8px; border-radius: 8px; cursor: pointer; margin-left: 10px; }
     .edit-trigger:hover { color: var(--orange); border-color: var(--orange); }
   </style>
@@ -84,7 +83,7 @@
 <div class="container">
   <header>
     <h1 class="main-title">🚀CULTURE SEED✨</h1>
-    <div class="sub-title">第二東京コンタクトセンター</div>
+    <div class="sub-title">文化を醸成中...</div>
     <div class="emoji-growth">🫘 → 🌱 → 🌼</div>
   </header>
 
@@ -145,6 +144,9 @@
           <option value="2026-02">2026年2月のランキング</option>
         </select>
         <div id="rankingList"></div>
+        <div class="values-grid" style="grid-template-columns:repeat(5, 1fr); gap:10px; margin-top:20px; font-size:16px; padding:10px; border-radius:12px; background:rgba(0,0,0,0.3); justify-items:center;">
+          <span>👍</span><span>❤️</span><span>✨</span><span>😂</span><span>🤝</span>
+        </div>
       </section>
     </aside>
   </div>
@@ -236,13 +238,11 @@
     `).join('') || "種がありません";
   }
 
-  /* 修正：投稿の編集機能 */
   window.editPost = (id) => {
     const newMsg = prompt("投稿内容を編集:", document.getElementById(`msg-${id}`).innerText);
     if(newMsg !== null) update(ref(db, `posts/${id}`), { message: newMsg });
   };
 
-  /* 修正：コメントの編集機能 */
   window.editReply = (pid, rid) => {
     const current = rawData[pid].replies[rid].text;
     const newMsg = prompt("コメントを編集:", current);
@@ -256,7 +256,6 @@
       Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
   }
 
-  /* 修正：ランキングの仕様変更（上位5位・タイ順位対応） */
   function renderRanking(posts) {
     const scores = {};
     posts.forEach(p => { 
@@ -270,22 +269,24 @@
     
     let html = "";
     let lastScore = -1;
-    let currentRank = 0;
-    let displayRank = 0;
     let count = 0;
+    let rankToDisplay = 0;
 
-    for (const [name, score] of sortedEntries) {
+    for (let i = 0; i < sortedEntries.length; i++) {
+      const [name, score] = sortedEntries[i];
       count++;
+
       if (score !== lastScore) {
-        displayRank = count;
+        rankToDisplay = count;
       }
       
-      // 5位まで表示（タイの場合は5名以上になる可能性があるためcountで制御）
-      if (displayRank > 5) break;
+      if (rankToDisplay > 5) break;
 
-      const rankText = score === lastScore ? `${displayRank}位タイ` : `${displayRank}.`;
+      const isTie = (i + 1 < sortedEntries.length && sortedEntries[i+1][1] === score) || (score === lastScore);
+      const rankLabel = isTie ? `${rankToDisplay}位タイ` : `${rankToDisplay}.`;
+
       html += `<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;">
-                <span>${rankText} ${name}</span>
+                <span>${rankLabel} ${name}</span>
                 <strong>${score} seeds</strong>
               </div>`;
       
