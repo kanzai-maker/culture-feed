@@ -18,7 +18,7 @@
       overflow-x: hidden; min-height: 100vh;
     }
 
-    /* 背景：維持 */
+    /* 背景演出：維持 */
     .galaxy-container {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: 
@@ -37,16 +37,13 @@
       100% { opacity: 0; }
     }
 
+    /* --- 復活：宇宙人演出 --- */
+    .alien { position: fixed; bottom: -20px; right: 20px; z-index: 100; font-size: 2rem; pointer-events: none; animation: float-alien 4s ease-in-out infinite; }
+    @keyframes float-alien { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-30px) rotate(15deg); } }
+    .alien-mini { position: fixed; bottom: 10px; right: 80px; z-index: 99; font-size: 1.2rem; pointer-events: none; animation: float-alien 3s ease-in-out infinite reverse; }
+
     /* 3D Container (維持) */
-    #astra-3d-bg {
-      position: absolute;
-      top: 0; left: 50%;
-      transform: translateX(-50%);
-      width: 100%; height: 400px;
-      z-index: 5; 
-      pointer-events: none;
-      opacity: 0.7;
-    }
+    #astra-3d-bg { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100%; height: 400px; z-index: 5; pointer-events: none; opacity: 0.7; }
 
     .container { width: 94%; max-width: 1250px; margin: 0 auto; position: relative; z-index: 10; padding-bottom: 80px; }
     header { text-align: center; padding: 30px 0 20px; position: relative; }
@@ -67,8 +64,6 @@
     .post-category-label { color: var(--orange); font-size: 22px; font-weight: 900; margin-bottom: 12px; display: block; }
     
     .btn-edit { background: none; border: none; color: #888; cursor: pointer; font-size: 12px; text-decoration: underline; margin-left: 10px; }
-    .btn-edit:hover { color: var(--orange); }
-
     textarea, select, input[type="text"] { width: 100%; background: var(--input-bg); border: 1px solid #555; color: white; padding: 15px; border-radius: 12px; margin-top: 8px; font-size: 16px; outline: none; }
     .btn-post { width: 100%; padding: 22px; background: linear-gradient(135deg, var(--orange), #ffcc80); color: #000; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; margin-top: 30px; font-size: 22px; }
     
@@ -87,6 +82,10 @@
 <div class="galaxy-container"></div>
 <div id="starField"></div>
 <div id="astra-3d-bg"></div>
+
+<div class="alien">👽</div>
+<div class="alien-mini" style="color: #64ffda;">👾</div>
+<div class="alien-mini" style="right: 140px; bottom: 30px; color: #ff5252;">🛸</div>
 
 <div class="container">
   <header>
@@ -146,7 +145,7 @@
         <div id="trendStats" style="font-size:16px; line-height:2.2;"></div>
       </section>
       <section class="panel">
-        <h3 style="margin-top:0; color:var(--orange);">今月のランキング</h3>
+        <h3 style="margin-top:0; color:var(--orange);">今月の投稿してくれた人ランキング</h3>
         <select id="rankArchiveSelect" style="width:100%; height:45px; border-radius:12px; margin-bottom:20px; background:#000; color:var(--orange); border:1px solid var(--orange); padding:0 15px; font-weight:bold;">
           <option value="2026-03">2026年3月のランキング</option>
           <option value="2026-02">2026年2月のランキング</option>
@@ -162,7 +161,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, push, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // --- 1. ASTRA 3D INTEGRATION (復元) ---
+  // --- 1. ASTRA 3D (復元) ---
   const astraContainer = document.getElementById("astra-3d-bg");
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, astraContainer.offsetWidth / 400, 0.1, 1000);
@@ -170,42 +169,18 @@
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(astraContainer.offsetWidth, 400);
   astraContainer.appendChild(renderer.domElement);
-
   const mainGroup = new THREE.Group();
   scene.add(mainGroup);
   scene.add(new THREE.AmbientLight(0xffffff, 1.5));
-  const earth = new THREE.Mesh(
-    new THREE.SphereGeometry(1.2, 64, 64),
-    new THREE.MeshStandardMaterial({ color: 0x1f6fff, emissive: 0x0d2a5a, emissiveIntensity: 0.5 })
-  );
-  earth.position.set(-0.2, 0, 0); 
-  mainGroup.add(earth);
-  const orbitRing = new THREE.Mesh(
-    new THREE.TorusGeometry(2.8, 0.01, 12, 100),
-    new THREE.MeshBasicMaterial({ color: 0x67d8ff, transparent: true, opacity: 0.3 })
-  );
-  orbitRing.position.copy(earth.position); 
-  orbitRing.rotation.x = Math.PI * 0.3;
-  mainGroup.add(orbitRing);
-
-  function animateAstra() {
-    requestAnimationFrame(animateAstra);
-    earth.rotation.y += 0.005;
-    mainGroup.rotation.y = Math.sin(Date.now() * 0.001) * 0.1;
-    renderer.render(scene, camera);
-  }
+  const earth = new THREE.Mesh(new THREE.SphereGeometry(1.2, 64, 64), new THREE.MeshStandardMaterial({ color: 0x1f6fff, emissive: 0x0d2a5a, emissiveIntensity: 0.5 }));
+  earth.position.set(-0.2, 0, 0); mainGroup.add(earth);
+  const orbitRing = new THREE.Mesh(new THREE.TorusGeometry(2.8, 0.01, 12, 100), new THREE.MeshBasicMaterial({ color: 0x67d8ff, transparent: true, opacity: 0.3 }));
+  orbitRing.position.copy(earth.position); orbitRing.rotation.x = Math.PI * 0.3; mainGroup.add(orbitRing);
+  function animateAstra() { requestAnimationFrame(animateAstra); earth.rotation.y += 0.005; mainGroup.rotation.y = Math.sin(Date.now() * 0.001) * 0.1; renderer.render(scene, camera); }
   animateAstra();
 
-  // --- 2. GOLDEN MASTER LOGIC (Firebase表示復元 & 追加修正) ---
-  const firebaseConfig = {
-    apiKey: "AIzaSyC_2bIvYpfgKrgyfQ9YKE1CykpnxLfQi0k",
-    authDomain: "second-cc-culture-feed.firebaseapp.com",
-    databaseURL: "https://second-cc-culture-feed-default-rtdb.firebaseio.com",
-    projectId: "second-cc-culture-feed",
-    storageBucket: "second-cc-culture-feed.firebasestorage.app",
-    messagingSenderId: "1042140470022",
-    appId: "1:1042140470022:web:8d2a9de18d6d55060f9c87"
-  };
+  // --- 2. LOGIC ---
+  const firebaseConfig = { apiKey: "AIzaSyC_2bIvYpfgKrgyfQ9YKE1CykpnxLfQi0k", authDomain: "second-cc-culture-feed.firebaseapp.com", databaseURL: "https://second-cc-culture-feed-default-rtdb.firebaseio.com", projectId: "second-cc-culture-feed", storageBucket: "second-cc-culture-feed.firebasestorage.app", messagingSenderId: "1042140470022", appId: "1:1042140470022:web:8d2a9de18d6d55060f9c87" };
   const fbApp = initializeApp(firebaseConfig);
   const db = getDatabase(fbApp);
   const postsRef = ref(db, 'posts');
@@ -230,72 +205,58 @@
     else if (sortMode === 'comment') feedPosts.sort((a, b) => Object.keys(b.replies||{}).length - Object.keys(a.replies||{}).length);
     else feedPosts.reverse();
 
-    // 1. Seed Box 描画 (編集ボタン付き)
     document.getElementById('feedList').innerHTML = feedPosts.map(p => `
       <div class="post-card">
-        <div class="post-header-info">${p.from} ➔ ${p.to} <button class="btn-edit" onclick="window.editPost('${p.id}')">編集</button></div>
+        <div class="post-header-info">${p.from} ➔ ${p.to} <button class="btn-edit" style="background:none; border:none; color:#888; cursor:pointer; text-decoration:underline;" onclick="window.editPost('${p.id}')">編集</button></div>
         <span class="post-category-label">${p.category}</span>
         <div style="margin:10px 0; color:var(--orange); font-size:12px;">${p.values ? p.values.map(v=>'#'+v.split(' ')[0]).join(' ') : ''}</div>
         <div style="margin:15px 0; font-size:18px; line-height:1.7; white-space:pre-wrap;">${p.message}</div>
         <div style="display:flex; gap:10px;">
           ${Object.entries(p.reactions || {"👏":0, "🔥":0, "💰":0}).map(([emoji, count]) => `<button onclick="window.addReaction('${p.id}','${emoji}',${count})" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer;">${emoji} ${count}</button>`).join('')}
         </div>
-        <div class="reply-box" style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
-          ${p.replies ? Object.entries(p.replies).map(([rid, r]) => `
-            <div style="background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; margin-bottom:5px; font-size:14px;">
-              ${r.text} <button class="btn-edit" onclick="window.editReply('${p.id}','${rid}')">編集</button>
-            </div>`).join('') : ''}
-          <div style="display:flex; gap:10px; margin-top:10px;">
-            <input type="text" id="re-${p.id}" placeholder="返信..." style="height:40px; margin:0; font-size:13px;">
-            <button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:10px; padding:0 20px; color:black; font-weight:bold;">送信</button>
-          </div>
+        <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+          ${p.replies ? Object.entries(p.replies).map(([rid, r]) => `<div style="background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; margin-bottom:5px; font-size:14px;">${r.text} <button class="btn-edit" style="background:none; border:none; color:#888; cursor:pointer;" onclick="window.editReply('${p.id}','${rid}')">編集</button></div>`).join('') : ''}
+          <div style="display:flex; gap:10px; margin-top:10px;"><input type="text" id="re-${p.id}" placeholder="返信..." style="height:40px; margin:0;"><button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:10px; padding:0 20px; font-weight:bold; cursor:pointer;">送信</button></div>
         </div>
-      </div>
-    `).join('') || "種がありません";
+      </div>`).join('') || "種がありません";
 
-    // 2. トレンド・ランキング算出 (5位タイ対応)
     const rPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === rankMonth);
     const cats = {"🤝 Thanks":0, "💰 商売を展開、商売を心から楽しむ":0, "🔥 MVVを体現":0, "💎 主体性の発揮":0, "✨ 凡事徹底":0};
-    const scores = {};
+    const senderScores = {}; // 投稿してくれた人(From)を集計
     rPosts.forEach(p => { 
       if(cats[p.category] !== undefined) cats[p.category]++;
-      const target = p.to !== "未選択" ? p.to : p.from;
-      scores[target] = (scores[target] || 0) + 1;
+      const sender = p.from;
+      if (sender !== "未選択" && sender !== "第二全体") senderScores[sender] = (senderScores[sender] || 0) + 1;
     });
 
-    document.getElementById('trendStats').innerHTML = `<div style="font-size:24px; color:var(--orange); font-weight:bold;">Total: ${rPosts.length}</div>` + 
-      Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
+    document.getElementById('trendStats').innerHTML = `<div style="font-size:24px; color:var(--orange); font-weight:bold;">Total: ${rPosts.length}</div>` + Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
 
-    const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
-    let rankHtml = "", lastScore = -1, rank = 0, displayCount = 0;
+    const sorted = Object.entries(senderScores).sort((a,b)=>b[1]-a[1]);
+    let rankHtml = "", lastS = -1, rank = 0, count = 0;
     for (let i = 0; i < sorted.length; i++) {
-      if (displayCount >= 5) break;
-      const [name, score] = sorted[i];
-      if (score !== lastScore) rank = i + 1;
-      const isTie = sorted.filter(x => x[1] === score).length > 1;
-      rankHtml += `<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${isTie ? rank+'位タイ' : rank+'.'} ${name}</span><strong>${score} pt</strong></div>`;
-      lastScore = score; displayCount++;
+      if (count >= 5) break;
+      const [name, s] = sorted[i];
+      if (s !== lastS) rank = i + 1;
+      const isTie = sorted.filter(x => x[1] === s).length > 1;
+      rankHtml += `<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${isTie ? rank+'位タイ' : rank+'.'} ${name}</span><strong>${s} seeds</strong></div>`;
+      lastS = s; count++;
     }
     document.getElementById('rankingList').innerHTML = rankHtml || "No Data";
   }
 
-  // グローバル関数
   window.setSort = (m) => { sortMode = m; document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active')); document.getElementById(`sort-${m}`).classList.add('active'); refreshUI(); };
-  window.addReaction = (id, emoji, count) => update(ref(db, `posts/${id}/reactions`), { [emoji]: count + 1 });
+  window.addReaction = (id, emoji, c) => update(ref(db, `posts/${id}/reactions`), { [emoji]: c + 1 });
   window.addReply = (id) => { const t = document.getElementById(`re-${id}`).value; if(t) { push(ref(db, `posts/${id}/replies`), { text: t, timestamp: serverTimestamp() }); document.getElementById(`re-${id}`).value = ""; } };
-  window.editPost = (id) => { const n = prompt("編集内容:", rawData[id].message); if(n) update(ref(db, `posts/${id}`), { message: n }); };
-  window.editReply = (pid, rid) => { const n = prompt("編集内容:", rawData[pid].replies[rid].text); if(n) update(ref(db, `posts/${pid}/replies/${rid}`), { text: n }); };
+  window.editPost = (id) => { const n = prompt("編集:", rawData[id].message); if(n) update(ref(db, `posts/${id}`), { message: n }); };
+  window.editReply = (pid, rid) => { const n = prompt("編集:", rawData[pid].replies[rid].text); if(n) update(ref(db, `posts/${pid}/replies/${rid}`), { text: n }); };
 
-  // 演出
   function triggerThanksEffect() {
     const t = document.createElement('div'); t.className = 'thanks-popup'; t.innerText = 'Thanks! ✨';
     document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
     const items = ["🌸", "🌼", "✨", "⭐", "☆"];
     for(let i=0; i<40; i++) {
       const p = document.createElement('div'); p.className = 'particle'; p.innerText = items[Math.floor(Math.random()*items.length)];
-      p.style.left = '50%'; p.style.top = '50%';
-      p.style.setProperty('--tx', (Math.random()-0.5)*1000+'px'); p.style.setProperty('--ty', (Math.random()-0.5)*1000+'px');
-      p.style.setProperty('--tr', Math.random()*720+'deg');
+      p.style.left = '50%'; p.style.top = '50%'; p.style.setProperty('--tx', (Math.random()-0.5)*1000+'px'); p.style.setProperty('--ty', (Math.random()-0.5)*1000+'px'); p.style.setProperty('--tr', Math.random()*720+'deg');
       document.body.appendChild(p); setTimeout(() => p.remove(), 2000);
     }
   }
@@ -305,11 +266,9 @@
     const checks = Array.from(document.querySelectorAll('input[name="cv"]:checked')).map(c => c.value);
     const now = new Date();
     const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    push(postsRef, { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey })
-    .then(() => { e.target.reset(); triggerThanksEffect(); });
+    push(postsRef, { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey }).then(() => { e.target.reset(); triggerThanksEffect(); });
   });
 
-  // Galaxy演出（維持）
   const sf = document.getElementById('starField');
   const starColors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0"];
   for(let i=0; i<250; i++) {
