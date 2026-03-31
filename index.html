@@ -30,7 +30,7 @@
     .twinkle-star { position: absolute; border-radius: 50%; opacity: 0; animation: twinkle var(--d) ease-in-out infinite; }
     @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
 
-    /* 修正：右上から左下へ流れる流れ星のアニメーション */
+    /* 右上から左下へ流れる流れ星のアニメーション */
     .shooting-star { 
       position: absolute; top: -50px; width: 1px; height: 1px; border-radius: 50%; opacity: 0;
       animation: shoot var(--d) linear infinite;
@@ -42,17 +42,22 @@
 
     /* 修正：右下の常時表示デコレーション用スタイル */
     #rightBottomDeco {
-      position: fixed; bottom: 20px; right: 20px; width: 250px; height: 180px;
+      position: fixed; bottom: 10px; right: 10px; width: 300px; height: 220px;
       pointer-events: none; z-index: 5;
     }
     .floating-item { position: absolute; }
     
-    @keyframes floatUfo { 0%, 100% { transform: translate(0, 0) rotate(-5deg); } 50% { transform: translate(10px, -15px) rotate(5deg); } }
-    @keyframes floatAstronaut1 { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-15px, 20px) rotate(10deg); } }
-    @keyframes floatAstronaut2 { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(20px, -10px) rotate(-15deg); } }
-    @keyframes floatAlien1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-10px, 15px); } }
-    @keyframes floatAlien2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(15px, 20px); } }
-    @keyframes floatAlien3 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, -15px); } }
+    /* UFO用アニメーション（大きく動かす） */
+    @keyframes floatUfoBig { 0%, 100% { transform: translate(0, 0) rotate(-3deg); } 50% { transform: translate(15px, -20px) rotate(3deg); } }
+    @keyframes floatUfoSmall { 0%, 100% { transform: translate(0, 0) rotate(5deg); } 50% { transform: translate(-10px, 10px) rotate(-5deg); } }
+    
+    /* 宇宙人用アニメーション（大小さまざまに動かす） */
+    @keyframes floatAlien1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-15px, 20px); } }
+    @keyframes floatAlien2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, 15px); } }
+    @keyframes floatAlien3 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-10px, -15px); } }
+    @keyframes floatAlien4 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(15px, -10px); } }
+    @keyframes floatAlien5 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-20px, 10px); } }
+    @keyframes floatAlien6 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(10px, 20px); } }
 
     /* Thanks演出 */
     .thanks-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 6rem; font-weight: 900; color: #fffde7; text-shadow: 0 0 50px #ffd700; z-index: 10000; pointer-events: none; animation: thanksFade 2.5s forwards; }
@@ -97,12 +102,15 @@
 <div class="galaxy-container"></div>
 <div id="starField"></div>
 <div id="rightBottomDeco">
-  <div class="floating-item" style="font-size: 60px; left: 0px; top: 0px; animation: floatUfo 6s ease-in-out infinite;">🛸</div>
-  <div class="floating-item" style="font-size: 45px; left: 80px; top: 70px; animation: floatAstronaut1 7s ease-in-out infinite;">🧑‍🚀</div>
-  <div class="floating-item" style="font-size: 35px; left: 160px; top: 20px; animation: floatAstronaut2 8s ease-in-out infinite;">🧑‍🚀</div>
-  <div class="floating-item" style="font-size: 30px; left: 30px; top: 110px; color: #64ffda; animation: floatAlien1 9s ease-in-out infinite;">👾</div>
-  <div class="floating-item" style="font-size: 40px; left: 120px; top: 120px; color: #ff5252; animation: floatAlien2 10s ease-in-out infinite;">👾</div>
-  <div class="floating-item" style="font-size: 25px; left: 200px; top: 100px; color: #b39ddb; animation: floatAlien3 11s ease-in-out infinite;">👾</div>
+  <div class="floating-item" style="font-size: 120px; left: 0px; top: -30px; z-index: 10; animation: floatUfoBig 7s ease-in-out infinite;">🛸</div>
+  <div class="floating-item" style="font-size: 50px; left: 180px; top: 10px; z-index: 5; animation: floatUfoSmall 8s ease-in-out infinite;">🛸</div>
+  
+  <div class="floating-item" style="font-size: 35px; left: 100px; top: 110px; color: #b39ddb; z-index: 15; animation: floatAlien1 9s ease-in-out infinite;">👾</div>
+  <div class="floating-item" style="font-size: 50px; left: 210px; top: 90px; color: #64ffda; z-index: 15; animation: floatAlien2 10s ease-in-out infinite;">👾</div>
+  <div class="floating-item" style="font-size: 25px; left: 160px; top: 140px; color: #f8bbd0; z-index: 15; animation: floatAlien3 11s ease-in-out infinite;">👾</div>
+  <div class="floating-item" style="font-size: 40px; left: 60px; top: 160px; color: #a5d6a7; z-index: 15; animation: floatAlien4 12s ease-in-out infinite;">👾</div>
+  <div class="floating-item" style="font-size: 30px; left: 190px; top: 170px; color: #ef9a9a; z-index: 15; animation: floatAlien5 13s ease-in-out infinite;">👾</div>
+  <div class="floating-item" style="font-size: 45px; left: 130px; top: 190px; color: #fff59d; z-index: 15; animation: floatAlien6 14s ease-in-out infinite;">👾</div>
 </div>
 
 <div class="container">
@@ -195,7 +203,6 @@
   let rawData = {};
   let sortMode = 'new';
 
-  /* 修正：現在の月から過去3ヶ月分のアーカイブタグを自動生成する関数 */
   function generateMonthArchiveOptions() {
     const now = new Date();
     const selects = [document.getElementById('archiveSelect'), document.getElementById('rankArchiveSelect')];
@@ -215,7 +222,6 @@
       select.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     });
   }
-  // 初期実行
   generateMonthArchiveOptions();
 
   const f = document.getElementById('fromName'), t = document.getElementById('toName'), vGrid = document.getElementById('valuesCheckboxes');
@@ -297,7 +303,6 @@
       Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
   }
 
-  /* 修正：ランキングの表記方法を変更（1位👑：・タイ対応・正確な表記） */
   function renderRanking(posts) {
     const scores = {};
     posts.forEach(p => { 
@@ -327,20 +332,18 @@
       const isTie = (i + 1 < sortedEntries.length && sortedEntries[i+1][1] === score) || (score === lastScore);
       let rankLabel = "";
       
-      // 👑王冠の絵文字と区切り文字「：」を適用
       if (rankToDisplay === 1) rankLabel = "🥇1位👑：";
       else if (rankToDisplay === 2) rankLabel = "🥈2位：";
       else if (rankToDisplay === 3) rankLabel = "🥉3位：";
       else rankLabel = `${rankToDisplay}位：`;
 
       if (isTie) {
-        // タイの場合は「：」を削除して「タイ」を付ける
         rankLabel = rankLabel.replace("：", "") + "タイ ";
       }
       
       html += `<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;">
                 <span>${rankLabel}${name}</span>
-                <strong>${score} seeds</strong>
+                strong>${score} seeds</strong>
               </div>`;
       
       lastScore = score;
@@ -422,7 +425,6 @@
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
   
-  /* 修正：右上から左下へ流れる大小さまざまな絵文字流れ星（ゆっくり） */
   setInterval(() => {
     const starItems = ["⭐", "🌟", "✨", "☄", "🪐"];
     const colors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0", "#b39ddb", "#ffcc80"];
@@ -430,14 +432,14 @@
     const s = document.createElement('div'); 
     s.className = 'shooting-star';
     s.innerText = starItems[Math.floor(Math.random() * starItems.length)];
-    s.style.left = (Math.random() * 80 + 20) + 'vw'; // 右側から生成
+    s.style.left = (Math.random() * 80 + 20) + 'vw';
     s.style.color = colors[Math.floor(Math.random() * colors.length)];
     s.style.fontSize = (Math.random() * 20 + 10) + 'px';
-    s.style.setProperty('--d', (Math.random() * 2 + 3) + 's'); // 3-5秒
+    s.style.setProperty('--d', (Math.random() * 2 + 3) + 's');
 
     sf.appendChild(s);
-    setTimeout(() => s.remove(), 5500); // アニメーション終了後に削除
-  }, 250); // 生成頻度
+    setTimeout(() => s.remove(), 5500);
+  }, 250);
 </script>
 </body>
 </html>
