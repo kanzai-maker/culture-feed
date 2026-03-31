@@ -40,18 +40,15 @@
       100% { transform: translate(-50px, calc(100vh + 50px)) rotate(135deg); opacity: 0.2; }
     }
 
-    /* 修正：右下の常時表示デコレーション用スタイル */
+    /* 右下の常時表示デコレーション */
     #rightBottomDeco {
       position: fixed; bottom: 10px; right: 10px; width: 300px; height: 220px;
       pointer-events: none; z-index: 5;
     }
     .floating-item { position: absolute; }
     
-    /* UFO用アニメーション（大きく動かす） */
     @keyframes floatUfoBig { 0%, 100% { transform: translate(0, 0) rotate(-3deg); } 50% { transform: translate(15px, -20px) rotate(3deg); } }
     @keyframes floatUfoSmall { 0%, 100% { transform: translate(0, 0) rotate(5deg); } 50% { transform: translate(-10px, 10px) rotate(-5deg); } }
-    
-    /* 宇宙人用アニメーション（大小さまざまに動かす） */
     @keyframes floatAlien1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-15px, 20px); } }
     @keyframes floatAlien2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, 15px); } }
     @keyframes floatAlien3 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-10px, -15px); } }
@@ -104,7 +101,6 @@
 <div id="rightBottomDeco">
   <div class="floating-item" style="font-size: 120px; left: 0px; top: -30px; z-index: 10; animation: floatUfoBig 7s ease-in-out infinite;">🛸</div>
   <div class="floating-item" style="font-size: 50px; left: 180px; top: 10px; z-index: 5; animation: floatUfoSmall 8s ease-in-out infinite;">🛸</div>
-  
   <div class="floating-item" style="font-size: 35px; left: 100px; top: 110px; color: #b39ddb; z-index: 15; animation: floatAlien1 9s ease-in-out infinite;">👾</div>
   <div class="floating-item" style="font-size: 50px; left: 210px; top: 90px; color: #64ffda; z-index: 15; animation: floatAlien2 10s ease-in-out infinite;">👾</div>
   <div class="floating-item" style="font-size: 25px; left: 160px; top: 140px; color: #f8bbd0; z-index: 15; animation: floatAlien3 11s ease-in-out infinite;">👾</div>
@@ -206,7 +202,6 @@
   function generateMonthArchiveOptions() {
     const now = new Date();
     const selects = [document.getElementById('archiveSelect'), document.getElementById('rankArchiveSelect')];
-    
     selects.forEach(select => {
       select.innerHTML = "";
       for (let i = 0; i < 3; i++) {
@@ -215,9 +210,7 @@
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const value = `${year}-${month}`;
         const label = `${year}年${parseInt(month)}月` + (i===0 ? "（今月）" : (i===1 ? "（先月）" : ""));
-        
-        const option = new Option(label, value);
-        select.add(option);
+        select.add(new Option(label, value));
       }
       select.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     });
@@ -233,12 +226,10 @@
   function refreshUI() {
     const boxMonth = document.getElementById('archiveSelect').value;
     const rankMonth = document.getElementById('rankArchiveSelect').value;
-    
     let feedPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === boxMonth);
     if (sortMode === 'stamp') feedPosts.sort((a, b) => (Object.values(b.reactions||{}).reduce((s,c)=>s+c,0)) - (Object.values(a.reactions||{}).reduce((s,c)=>s+c,0)));
     else if (sortMode === 'comment') feedPosts.sort((a, b) => Object.keys(b.replies||{}).length - Object.keys(a.replies||{}).length);
     else feedPosts.reverse();
-
     renderFeed(feedPosts);
     const rPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === rankMonth);
     renderStats(rPosts);
@@ -246,109 +237,54 @@
   }
 
   function renderFeed(posts) {
-    const fixedReactions = [
-      {emoji: "🤝", label: "Thanks"},
-      {emoji: "💰", label: "商売"},
-      {emoji: "🔥", label: "MVV"},
-      {emoji: "💎", label: "主体者"},
-      {emoji: "✨", label: "凡事徹底"}
-    ];
-
+    const fixedReactions = [{emoji: "🤝", label: "Thanks"}, {emoji: "💰", label: "商売"}, {emoji: "🔥", label: "MVV"}, {emoji: "💎", label: "主体者"}, {emoji: "✨", label: "凡事徹底"}];
     document.getElementById('feedList').innerHTML = posts.map(p => `
       <div class="post-card">
-        <div class="post-header-info">
-          ${p.from} ➔ ${p.to}
-          <button class="edit-trigger" onclick="window.editPost('${p.id}')">編集</button>
-        </div>
+        <div class="post-header-info">${p.from} ➔ ${p.to} <button class="edit-trigger" onclick="window.editPost('${p.id}')">編集</button></div>
         <span class="post-category-label">${p.category}</span>
         <div style="margin:10px 0; color:var(--orange); font-size:12px;">${p.values ? p.values.map(v=>'#'+v.split(' ')[0]).join(' ') : ''}</div>
         <div id="msg-${p.id}" style="margin:15px 0; font-size:18px; line-height:1.7; white-space:pre-wrap;">${p.message}</div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          ${fixedReactions.map(fr => {
-            const count = (p.reactions && p.reactions[fr.emoji]) ? p.reactions[fr.emoji] : 0;
-            return `<button onclick="window.addReaction('${p.id}','${fr.emoji}',${count})" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer; font-size:14px;">${fr.emoji}${fr.label} ${count}</button>`;
-          }).join('')}
+          ${fixedReactions.map(fr => `<button onclick="window.addReaction('${p.id}','${fr.emoji}',${(p.reactions && p.reactions[fr.emoji]) ? p.reactions[fr.emoji] : 0})" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer; font-size:14px;">${fr.emoji}${fr.label} ${(p.reactions && p.reactions[fr.emoji]) ? p.reactions[fr.emoji] : 0}</button>`).join('')}
           <button onclick="window.promptEmoji('${p.id}')" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer;">＋</button>
         </div>
         <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
-          ${p.replies ? Object.entries(p.replies).map(([rid, r]) => `
-            <div style="background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; margin-bottom:5px; font-size:14px; display:flex; justify-content:space-between; align-items:center;">
-              <span>${r.text}</span>
-              <button class="edit-trigger" onclick="window.editReply('${p.id}','${rid}')" style="margin:0;">編集</button>
-            </div>`).join('') : ''}
-          <div style="display:flex; gap:10px; margin-top:10px; align-items: center;">
-            <input type="text" id="re-${p.id}" placeholder="返信..." style="flex:1; height:45px; font-size:14px; margin:0;">
-            <button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:12px; height:45px; padding:0 25px; color:black; font-weight:bold; cursor:pointer; white-space:nowrap; min-width:80px;">送信</button>
-          </div>
+          ${p.replies ? Object.entries(p.replies).map(([rid, r]) => `<div style="background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; margin-bottom:5px; font-size:14px; display:flex; justify-content:space-between; align-items:center;"><span>${r.text}</span><button class="edit-trigger" onclick="window.editReply('${p.id}','${rid}')" style="margin:0;">編集</button></div>`).join('') : ''}
+          <div style="display:flex; gap:10px; margin-top:10px; align-items: center;"><input type="text" id="re-${p.id}" placeholder="返信..." style="flex:1; height:45px; font-size:14px; margin:0;"><button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:12px; height:45px; padding:0 25px; color:black; font-weight:bold; cursor:pointer; white-space:nowrap; min-width:80px;">送信</button></div>
         </div>
-      </div>
-    `).join('') || "種がありません";
+      </div>`).join('') || "種がありません";
   }
 
-  window.editPost = (id) => {
-    const newMsg = prompt("投稿内容を編集:", document.getElementById(`msg-${id}`).innerText);
-    if(newMsg !== null) update(ref(db, `posts/${id}`), { message: newMsg });
-  };
-
-  window.editReply = (pid, rid) => {
-    const current = rawData[pid].replies[rid].text;
-    const newMsg = prompt("コメントを編集:", current);
-    if(newMsg !== null) update(ref(db, `posts/${pid}/replies/${rid}`), { text: newMsg });
-  };
+  window.editPost = (id) => { const newMsg = prompt("投稿内容を編集:", document.getElementById(`msg-${id}`).innerText); if(newMsg !== null) update(ref(db, `posts/${id}`), { message: newMsg }); };
+  window.editReply = (pid, rid) => { const current = rawData[pid].replies[rid].text; const newMsg = prompt("コメントを編集:", current); if(newMsg !== null) update(ref(db, `posts/${pid}/replies/${rid}`), { text: newMsg }); };
 
   function renderStats(posts) {
     const cats = {"🤝 Thanks":0, "💰 商売を展開、商売を心から楽しむ":0, "🔥 MVVを体現":0, "💎 主体性の発揮":0, "✨ 凡事徹底":0};
     posts.forEach(p => { if(cats[p.category] !== undefined) cats[p.category]++; });
-    document.getElementById('trendStats').innerHTML = `<div style="font-size:24px; color:var(--orange); font-weight:bold;">Total: ${posts.length}</div>` + 
-      Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
+    document.getElementById('trendStats').innerHTML = `<div style="font-size:24px; color:var(--orange); font-weight:bold;">Total: ${posts.length}</div>` + Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
   }
 
+  /* 修正：ランキング表記から「strong>」を削除し整形 */
   function renderRanking(posts) {
     const scores = {};
-    posts.forEach(p => { 
-      const sender = p.from;
-      if(sender !== "未選択" && sender !== "第二全体") {
-        scores[sender] = (scores[sender] || 0) + 1; 
-      }
-    });
-
-    const sortedEntries = Object.entries(scores).sort((a,b) => b[1] - a[1]);
-    
-    let html = "";
-    let lastScore = -1;
-    let count = 0;
-    let rankToDisplay = 0;
-
-    for (let i = 0; i < sortedEntries.length; i++) {
-      const [name, score] = sortedEntries[i];
+    posts.forEach(p => { const s = p.from; if(s !== "未選択" && s !== "第二全体") scores[s] = (scores[s] || 0) + 1; });
+    const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+    let html = "", lastScore = -1, count = 0, rankToDisplay = 0;
+    for (let i = 0; i < sorted.length; i++) {
+      const [name, score] = sorted[i];
       count++;
-
-      if (score !== lastScore) {
-        rankToDisplay = count;
-      }
-      
+      if (score !== lastScore) rankToDisplay = count;
       if (rankToDisplay > 5) break;
-
-      const isTie = (i + 1 < sortedEntries.length && sortedEntries[i+1][1] === score) || (score === lastScore);
+      const isTie = (i + 1 < sorted.length && sorted[i+1][1] === score) || (score === lastScore);
       let rankLabel = "";
-      
       if (rankToDisplay === 1) rankLabel = "🥇1位👑：";
-      else if (rankToDisplay === 2) rankLabel = "🥈2位：";
-      else if (rankToDisplay === 3) rankLabel = "🥉3位：";
-      else rankLabel = `${rankToDisplay}位：`;
-
-      if (isTie) {
-        rankLabel = rankLabel.replace("：", "") + "タイ ";
-      }
-      
-      html += `<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;">
-                <span>${rankLabel}${name}</span>
-                strong>${score} seeds</strong>
-              </div>`;
-      
+      else if (rankToDisplay === 2) rankLabel = "🥈2位";
+      else if (rankToDisplay === 3) rankLabel = "🥉3位";
+      else rankLabel = `${rankToDisplay}位`;
+      if (isTie) rankLabel += "タイ "; else if (rankToDisplay !== 1) rankLabel += "：";
+      html += `<div style="font-size:18px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${rankLabel}${name}</span><strong>${score} seeds</strong></div>`;
       lastScore = score;
     }
-
     document.getElementById('rankingList').innerHTML = html || "No Data";
   }
 
@@ -359,14 +295,7 @@
 
   async function sendToSpreadsheet(data) {
     if(!GAS_WEBAPP_URL) return;
-    try {
-      await fetch(GAS_WEBAPP_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-    } catch (e) { console.error("Sync Error:", e); }
+    try { await fetch(GAS_WEBAPP_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) }); } catch (e) { console.error("Sync Error:", e); }
   }
 
   document.getElementById('cultureForm').addEventListener('submit', (e) => {
@@ -375,28 +304,8 @@
     const now = new Date();
     const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const displayDate = now.toLocaleString('ja-JP');
-
-    const postData = { 
-      from: f.value, 
-      to: t.value, 
-      category: document.getElementById('category').value, 
-      values: checks, 
-      message: document.getElementById('message').value, 
-      timestamp: serverTimestamp(), 
-      dateKey: dateKey 
-    };
-
-    push(postsRef, postData)
-    .then(() => { 
-      sendToSpreadsheet({ 
-        type: "post", 
-        displayDate: displayDate,
-        ...postData,
-        values: checks.join(', ')
-      });
-      e.target.reset(); 
-      triggerThanksEffect(); 
-    });
+    const postData = { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey };
+    push(postsRef, postData).then(() => { sendToSpreadsheet({ type: "post", displayDate: displayDate, ...postData, values: checks.join(', ') }); e.target.reset(); triggerThanksEffect(); });
   });
 
   function triggerThanksEffect() {
@@ -416,29 +325,19 @@
   document.getElementById('rankArchiveSelect').addEventListener('change', refreshUI);
 
   const sf = document.getElementById('starField');
-  const starColors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0"];
   for(let i=0; i<250; i++) {
     const s = document.createElement('div'); s.className = 'twinkle-star';
     s.style.width = s.style.height = (Math.random()*3+1)+'px';
     s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*150+'vh';
-    s.style.background = starColors[Math.floor(Math.random()*starColors.length)];
+    s.style.background = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0"][Math.floor(Math.random()*7)];
     s.style.setProperty('--d', (Math.random()*4+2)+'s'); sf.appendChild(s);
   }
-  
   setInterval(() => {
-    const starItems = ["⭐", "🌟", "✨", "☄", "🪐"];
-    const colors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0", "#b39ddb", "#ffcc80"];
-
-    const s = document.createElement('div'); 
-    s.className = 'shooting-star';
-    s.innerText = starItems[Math.floor(Math.random() * starItems.length)];
-    s.style.left = (Math.random() * 80 + 20) + 'vw';
-    s.style.color = colors[Math.floor(Math.random() * colors.length)];
-    s.style.fontSize = (Math.random() * 20 + 10) + 'px';
-    s.style.setProperty('--d', (Math.random() * 2 + 3) + 's');
-
-    sf.appendChild(s);
-    setTimeout(() => s.remove(), 5500);
+    const s = document.createElement('div'); s.className = 'shooting-star';
+    s.innerText = ["⭐", "🌟", "✨", "☄", "🪐"][Math.floor(Math.random()*5)];
+    s.style.left = (Math.random()*80+20)+'vw'; s.style.color = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0", "#b39ddb"][Math.floor(Math.random()*8)];
+    s.style.fontSize = (Math.random()*20+10)+'px'; s.style.setProperty('--d', (Math.random()*2+3)+'s');
+    sf.appendChild(s); setTimeout(() => s.remove(), 5500);
   }, 250);
 </script>
 </body>
