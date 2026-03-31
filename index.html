@@ -60,23 +60,26 @@
     .sort-area { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
     .sort-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-size: 13px; }
     .sort-btn.active { background: var(--orange); color: #000; font-weight: bold; }
-    .values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 15px; margin: 10px 0; }
-    .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
+    
     #feedList { max-height: 800px; overflow-y: auto; padding-right: 15px; scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
     .post-card { background: rgba(255,255,255,0.08); border-radius: 25px; padding: 25px; margin-bottom: 25px; border-left: 8px solid var(--orange); position: relative; }
     .post-header-info { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
     .post-category-label { color: var(--orange); font-size: 22px; font-weight: 900; margin-bottom: 12px; display: block; }
-    textarea, select, input[type="text"] { width: 100%; background: var(--input-bg); border: 1px solid #555; color: white; padding: 15px; border-radius: 12px; margin-top: 8px; font-size: 16px; outline: none; }
-    .btn-post { width: 100%; padding: 22px; background: linear-gradient(135deg, var(--orange), #ffcc80); color: #000; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; margin-top: 30px; font-size: 22px; }
     
-    /* 編集ボタン等の小ボタン */
     .btn-edit { background: none; border: none; color: #888; cursor: pointer; font-size: 12px; text-decoration: underline; margin-left: 10px; }
     .btn-edit:hover { color: var(--orange); }
 
+    textarea, select, input[type="text"] { width: 100%; background: var(--input-bg); border: 1px solid #555; color: white; padding: 15px; border-radius: 12px; margin-top: 8px; font-size: 16px; outline: none; }
+    .btn-post { width: 100%; padding: 22px; background: linear-gradient(135deg, var(--orange), #ffcc80); color: #000; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; margin-top: 30px; font-size: 22px; }
+    
     .thanks-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 6rem; font-weight: 900; color: #fffde7; text-shadow: 0 0 50px #ffd700; z-index: 10000; pointer-events: none; animation: thanksFade 2.5s forwards; }
     @keyframes thanksFade { 0% { opacity: 0; scale: 0.5; } 20% { opacity: 1; scale: 1.2; } 100% { opacity: 0; transform: translate(-50%, -70%); scale: 1; } }
     .particle { position: fixed; pointer-events: none; z-index: 9999; animation: particle-move 2s ease-out forwards; }
     @keyframes particle-move { 0% { opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)); opacity: 0; } }
+
+    .values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 15px; margin: 10px 0; }
+    .value-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
+    .value-item input { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--orange); }
   </style>
 </head>
 <body>
@@ -159,7 +162,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, push, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // --- 1. ASTRA 3D INTEGRATION ---
+  // --- 1. ASTRA 3D INTEGRATION (復元) ---
   const astraContainer = document.getElementById("astra-3d-bg");
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, astraContainer.offsetWidth / 400, 0.1, 1000);
@@ -171,17 +174,12 @@
   const mainGroup = new THREE.Group();
   scene.add(mainGroup);
   scene.add(new THREE.AmbientLight(0xffffff, 1.5));
-  const dirLight = new THREE.DirectionalLight(0xffffff, 2);
-  dirLight.position.set(5, 3, 5);
-  scene.add(dirLight);
-
   const earth = new THREE.Mesh(
     new THREE.SphereGeometry(1.2, 64, 64),
     new THREE.MeshStandardMaterial({ color: 0x1f6fff, emissive: 0x0d2a5a, emissiveIntensity: 0.5 })
   );
   earth.position.set(-0.2, 0, 0); 
   mainGroup.add(earth);
-
   const orbitRing = new THREE.Mesh(
     new THREE.TorusGeometry(2.8, 0.01, 12, 100),
     new THREE.MeshBasicMaterial({ color: 0x67d8ff, transparent: true, opacity: 0.3 })
@@ -198,7 +196,7 @@
   }
   animateAstra();
 
-  // --- 2. GOLDEN MASTER LOGIC ---
+  // --- 2. GOLDEN MASTER LOGIC (Firebase表示復元 & 追加修正) ---
   const firebaseConfig = {
     apiKey: "AIzaSyC_2bIvYpfgKrgyfQ9YKE1CykpnxLfQi0k",
     authDomain: "second-cc-culture-feed.firebaseapp.com",
@@ -232,14 +230,8 @@
     else if (sortMode === 'comment') feedPosts.sort((a, b) => Object.keys(b.replies||{}).length - Object.keys(a.replies||{}).length);
     else feedPosts.reverse();
 
-    renderFeed(feedPosts);
-    const rPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === rankMonth);
-    renderStats(rPosts);
-    renderRanking(rPosts);
-  }
-
-  function renderFeed(posts) {
-    document.getElementById('feedList').innerHTML = posts.map(p => `
+    // 1. Seed Box 描画 (編集ボタン付き)
+    document.getElementById('feedList').innerHTML = feedPosts.map(p => `
       <div class="post-card">
         <div class="post-header-info">${p.from} ➔ ${p.to} <button class="btn-edit" onclick="window.editPost('${p.id}')">編集</button></div>
         <span class="post-category-label">${p.category}</span>
@@ -253,72 +245,48 @@
             <div style="background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; margin-bottom:5px; font-size:14px;">
               ${r.text} <button class="btn-edit" onclick="window.editReply('${p.id}','${rid}')">編集</button>
             </div>`).join('') : ''}
-          <div style="display:flex; gap:5px; margin-top:10px;">
-            <input type="text" id="re-${p.id}" placeholder="返信..." style="height:35px; font-size:13px; margin:0;">
-            <button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:8px; padding:0 15px; color:black; font-weight:bold; cursor:pointer;">送信</button>
+          <div style="display:flex; gap:10px; margin-top:10px;">
+            <input type="text" id="re-${p.id}" placeholder="返信..." style="height:40px; margin:0; font-size:13px;">
+            <button onclick="window.addReply('${p.id}')" style="background:var(--orange); border:none; border-radius:10px; padding:0 20px; color:black; font-weight:bold;">送信</button>
           </div>
         </div>
       </div>
     `).join('') || "種がありません";
-  }
 
-  function renderStats(posts) {
+    // 2. トレンド・ランキング算出 (5位タイ対応)
+    const rPosts = Object.entries(rawData).map(([id, p]) => ({ id, ...p })).filter(p => p.dateKey === rankMonth);
     const cats = {"🤝 Thanks":0, "💰 商売を展開、商売を心から楽しむ":0, "🔥 MVVを体現":0, "💎 主体性の発揮":0, "✨ 凡事徹底":0};
-    posts.forEach(p => { if(cats[p.category] !== undefined) cats[p.category]++; });
-    document.getElementById('trendStats').innerHTML = `<div style="font-size:24px; color:var(--orange); font-weight:bold;">Total: ${posts.length}</div>` + 
-      Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
-  }
-
-  function renderRanking(posts) {
     const scores = {};
-    posts.forEach(p => { const target = p.to !== "未選択" ? p.to : p.from; scores[target] = (scores[target] || 0) + 1; });
-    
-    // スコア降順にソート
+    rPosts.forEach(p => { 
+      if(cats[p.category] !== undefined) cats[p.category]++;
+      const target = p.to !== "未選択" ? p.to : p.from;
+      scores[target] = (scores[target] || 0) + 1;
+    });
+
+    document.getElementById('trendStats').innerHTML = `<div style="font-size:24px; color:var(--orange); font-weight:bold;">Total: ${rPosts.length}</div>` + 
+      Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
+
     const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
-    
-    let rankingHtml = "";
-    let lastScore = -1;
-    let rank = 0;
-    let displayCount = 0;
-
+    let rankHtml = "", lastScore = -1, rank = 0, displayCount = 0;
     for (let i = 0; i < sorted.length; i++) {
-      if (displayCount >= 5) break; // 上位5位まで
-
+      if (displayCount >= 5) break;
       const [name, score] = sorted[i];
-      // 順位ロジック（タイ対応）
-      if (score !== lastScore) {
-        rank = i + 1;
-      }
-      
+      if (score !== lastScore) rank = i + 1;
       const isTie = sorted.filter(x => x[1] === score).length > 1;
-      const rankText = isTie ? `${rank}位タイ` : `${rank}.`;
-
-      rankingHtml += `
-        <div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;">
-          <span>${rankText} ${name}</span><strong>${score} seeds</strong>
-        </div>`;
-      
-      lastScore = score;
-      displayCount++;
+      rankHtml += `<div style="font-size:20px; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;"><span>${isTie ? rank+'位タイ' : rank+'.'} ${name}</span><strong>${score} pt</strong></div>`;
+      lastScore = score; displayCount++;
     }
-
-    document.getElementById('rankingList').innerHTML = rankingHtml || "No Data";
+    document.getElementById('rankingList').innerHTML = rankHtml || "No Data";
   }
 
+  // グローバル関数
   window.setSort = (m) => { sortMode = m; document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active')); document.getElementById(`sort-${m}`).classList.add('active'); refreshUI(); };
   window.addReaction = (id, emoji, count) => update(ref(db, `posts/${id}/reactions`), { [emoji]: count + 1 });
   window.addReply = (id) => { const t = document.getElementById(`re-${id}`).value; if(t) { push(ref(db, `posts/${id}/replies`), { text: t, timestamp: serverTimestamp() }); document.getElementById(`re-${id}`).value = ""; } };
+  window.editPost = (id) => { const n = prompt("編集内容:", rawData[id].message); if(n) update(ref(db, `posts/${id}`), { message: n }); };
+  window.editReply = (pid, rid) => { const n = prompt("編集内容:", rawData[pid].replies[rid].text); if(n) update(ref(db, `posts/${pid}/replies/${rid}`), { text: n }); };
 
-  /* --- 追加：編集機能 --- */
-  window.editPost = (id) => {
-    const newMsg = prompt("投稿内容を編集しますか？", rawData[id].message);
-    if(newMsg !== null) update(ref(db, `posts/${id}`), { message: newMsg });
-  };
-  window.editReply = (pid, rid) => {
-    const newMsg = prompt("コメント内容を編集しますか？", rawData[pid].replies[rid].text);
-    if(newMsg !== null) update(ref(db, `posts/${pid}/replies/${rid}`), { text: newMsg });
-  };
-
+  // 演出
   function triggerThanksEffect() {
     const t = document.createElement('div'); t.className = 'thanks-popup'; t.innerText = 'Thanks! ✨';
     document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
@@ -341,6 +309,7 @@
     .then(() => { e.target.reset(); triggerThanksEffect(); });
   });
 
+  // Galaxy演出（維持）
   const sf = document.getElementById('starField');
   const starColors = ["#ffffff", "#fffde7", "#ffcc80", "#ff5252", "#64ffda", "#448aff", "#f8bbd0"];
   for(let i=0; i<250; i++) {
