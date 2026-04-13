@@ -143,7 +143,7 @@
             <label>項目選択</label>
             <select id="category">
               <option value="🤝 Thanks">🤝 Thanks</option>
-              <option value="💰 商売を展開、商売を心から楽しむ">💰 商売を展開、商売を心から楽しむ</option>
+              <option value="💰 商売を心から楽しむ">💰 商売を心から楽しむ</option>
               <option value="🔥 MVVを体現">🔥 MVVを体現</option>
               <option value="💎 主体性の発揮">💎 主体性の発揮</option>
               <option value="✨ 凡事徹底">✨ 凡事徹底</option>
@@ -259,7 +259,8 @@
   window.editReply = (pid, rid) => { const current = rawData[pid].replies[rid].text; const newMsg = prompt("コメントを編集:", current); if(newMsg !== null) update(ref(db, `posts/${pid}/replies/${rid}`), { text: newMsg }); };
 
   function renderStats(posts) {
-    const cats = {"🤝 Thanks":0, "💰 商売を展開、商売を心から楽しむ":0, "🔥 MVVを体現":0, "💎 主体性の発揮":0, "✨ 凡事徹底":0};
+    // 修正：集計用のキー名を短縮版に変更
+    const cats = {"🤝 Thanks":0, "💰 商売を心から楽しむ":0, "🔥 MVVを体現":0, "💎 主体性の発揮":0, "✨ 凡事徹底":0};
     posts.forEach(p => { if(cats[p.category] !== undefined) cats[p.category]++; });
     document.getElementById('trendStats').innerHTML = `<div style="font-size:24px; color:var(--orange); font-weight:bold;">Total: ${posts.length}</div>` + Object.entries(cats).map(([label, count]) => `<div>${label}: ${count}</div>`).join('');
   }
@@ -303,17 +304,15 @@
     const now = new Date();
     const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const displayDate = now.toLocaleString('ja-JP');
-    
-    // 修正：語尾に勝手に付く「さんが投稿しました！」を考慮し、文章を調整。
-    // またリンクは多くのチャットツールで認識されやすい URL 直書き ＋ ハイパーリンク形式を併用。
     const postData = { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey };
     
-    const longMessage = `🚀CULTURE SEEDが更新されました✨\n🫘Sow Seeds🌱\n${f.value}さんが${t.value}さん宛に投稿しました！\n確認して盛り上げましょう🔥\nこちらを【クリック】<https://kanzai-maker.github.io/culture-feed/>\n\n（※システム通知：上記の`;
+    // 修正：通知文言の簡略化。末尾の余計な記号を削除し、指定されたURL直書きに変更。
+    const longMessage = `🚀CULTURE SEEDが更新されました✨\n🫘Sow Seeds🌱\n${f.value}さんが${t.value}さん宛に投稿しました！\n確認して盛り上げましょう🔥\nhttps://kanzai-maker.github.io/culture-feed/`;
 
     push(postsRef, postData).then(() => { 
       sendToSpreadsheet({ 
         ...postData,
-        from: longMessage, // 修正：文言を「〜さんが投稿しました！」が末尾についても不自然でないように調整
+        from: longMessage, 
         type: "post", 
         displayDate: displayDate, 
         values: checks.join(', '),
