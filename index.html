@@ -242,7 +242,7 @@
       <div class="post-card">
         <div class="post-header-info">${p.from} ➔ ${p.to} <button class="edit-trigger" onclick="window.editPost('${p.id}')">編集</button></div>
         <span class="post-category-label">${p.category}</span>
-        <div style="margin:10px 0; color:var(--orange); font-size:12px;">${p.values ? p.values.map(v=>'#'+v.split(' ')[0]).join(' ') : ''}</div>
+        <div style="margin:10px 0; color:var(--orange); font-size:12px;">${p.values ? p.values.map(v=>'#'+v).join(' ') : ''}</div>
         <div id="msg-${p.id}" style="margin:15px 0; font-size:18px; line-height:1.7; white-space:pre-wrap;">${p.message}</div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           ${fixedReactions.map(fr => `<button onclick="window.addReaction('${p.id}','${fr.emoji}',${(p.reactions && p.reactions[fr.emoji]) ? p.reactions[fr.emoji] : 0})" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:99px; cursor:pointer; font-size:14px;">${fr.emoji}${fr.label} ${(p.reactions && p.reactions[fr.emoji]) ? p.reactions[fr.emoji] : 0}</button>`).join('')}
@@ -304,7 +304,20 @@
     const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const displayDate = now.toLocaleString('ja-JP');
     const postData = { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey };
-    push(postsRef, postData).then(() => { sendToSpreadsheet({ type: "post", displayDate: displayDate, ...postData, values: checks.join(', ') }); e.target.reset(); triggerThanksEffect(); });
+    
+    // 追加・修正：チャット通知用のデータを指定のフォーマットに変更
+    push(postsRef, postData).then(() => { 
+      sendToSpreadsheet({ 
+        type: "post", 
+        displayDate: displayDate, 
+        ...postData, 
+        values: checks.join(', '),
+        // GAS側で組み立てやすいようにfromとtoを個別に送付、文言構成はGAS側で行う想定
+        customMessage: `🚀CULTURE SEEDが更新されました✨\n🫘Sow Seeds🌱\n${f.value}さんが${t.value}さん宛に投稿しました！\n確認して盛り上げましょう🔥\nこちらをクリック （https://kanzai-maker.github.io/culture-feed/）`
+      }); 
+      e.target.reset(); 
+      triggerThanksEffect(); 
+    });
   });
 
   function triggerThanksEffect() {
