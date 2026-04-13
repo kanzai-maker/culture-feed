@@ -303,16 +303,22 @@
     const now = new Date();
     const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const displayDate = now.toLocaleString('ja-JP');
+    
+    // 修正：既存の通知システム（GAS側）が「fromName」または「from」という項目を通知に使っている可能性が高いため、
+    // from の中身自体をご指定の長い文章に置き換えて送信します。
     const postData = { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey };
     
-    // 修正：チャット通知用文言を【こちら！！】のリンク形式に変更
+    const longMessage = `🚀CULTURE SEEDが更新されました✨\n🫘Sow Seeds🌱\n${f.value}さんが${t.value}さん宛に投稿しました！\n確認して盛り上げましょう🔥\nこちらをクリック <a href="https://kanzai-maker.github.io/culture-feed/">【こちら！！】</a>`;
+
     push(postsRef, postData).then(() => { 
+      // GASに送るデータにおいて、通知に使われる可能性が高い「from」を上書きします
       sendToSpreadsheet({ 
+        ...postData,
+        from: longMessage, // 修正：通知文言そのものを送信項目にセット
         type: "post", 
         displayDate: displayDate, 
-        ...postData, 
         values: checks.join(', '),
-        customMessage: `🚀CULTURE SEEDが更新されました✨\n🫘Sow Seeds🌱\n${f.value}さんが${t.value}さん宛に投稿しました！\n確認して盛り上げましょう🔥\nこちらをクリック<a href="https://kanzai-maker.github.io/culture-feed/">【こちら！！】</a>`
+        customMessage: longMessage 
       }); 
       e.target.reset(); 
       triggerThanksEffect(); 
