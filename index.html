@@ -305,15 +305,14 @@
     const displayDate = now.toLocaleString('ja-JP');
     const postData = { from: f.value, to: t.value, category: document.getElementById('category').value, values: checks, message: document.getElementById('message').value, timestamp: serverTimestamp(), dateKey: dateKey };
     
-    // 追加・修正：チャット通知用のデータを指定のフォーマットに変更
+    // 修正：チャット通知用文言を【こちら！！】のリンク形式に変更
     push(postsRef, postData).then(() => { 
       sendToSpreadsheet({ 
         type: "post", 
         displayDate: displayDate, 
         ...postData, 
         values: checks.join(', '),
-        // GAS側で組み立てやすいようにfromとtoを個別に送付、文言構成はGAS側で行う想定
-        customMessage: `🚀CULTURE SEEDが更新されました✨\n🫘Sow Seeds🌱\n${f.value}さんが${t.value}さん宛に投稿しました！\n確認して盛り上げましょう🔥\nこちらをクリック （https://kanzai-maker.github.io/culture-feed/）`
+        customMessage: `🚀CULTURE SEEDが更新されました✨\n🫘Sow Seeds🌱\n${f.value}さんが${t.value}さん宛に投稿しました！\n確認して盛り上げましょう🔥\nこちらをクリック<a href="https://kanzai-maker.github.io/culture-feed/">【こちら！！】</a>`
       }); 
       e.target.reset(); 
       triggerThanksEffect(); 
